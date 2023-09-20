@@ -1,0 +1,392 @@
+body {
+    font-family: Verdana,Geneva,sans-serif;
+    font-size: 14px;
+    background: #f2f2f2
+}
+
+.error {
+    text-align: center;
+    font-size: 14px;
+    color: red;
+}
+
+.login_top {
+    width: 100vw;
+    height: 15vh;
+    display: flex;
+    font-size: 20px;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #f5ba1a;
+    background-color: #fff;
+    color: #343a40;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    background-image: url('../image/top_bg.gif');
+    background-size: contain; /* Изменяйте на своё усмотрение, чтобы вписать изображение */
+    background-repeat: no-repeat;
+}
+
+
+.login_top img {
+    float: left;
+    height: 15vh;
+    position: absolute;
+    display: flex;
+}
+
+.href_to_reg {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.navbar-left {
+    position: absolute;
+    background-color: #000000;
+    /*-moz-border-radius-bottomright: 10px;*/
+    width: 0; /* Изначально ширина 0 */
+    /*margin-top: 0px;*/
+    height: 94vh;
+    transition: width 0.5s; /* Добавляем анимацию */
+}
+
+.navbar-left.show {
+    padding: 10px;
+    width: 200px; /* Показываем блок, устанавливая ширину */
+}
+
+.navbar-left button {
+    display: block;
+    width: 100%;
+    height: 45px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.l_btn.active  {
+    background-color: #f5ba1a;
+}
+
+.clearfix:after {
+    content: "";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    height: 0
+}
+
+.form_wrapper {
+    background: #fff;
+    width: 600px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 25px;
+    margin: 8%auto 0;
+    position: relative;
+    z-index: 1;
+    border-top: 5px solid #f5ba1a;
+    -webkit-box-shadow: 0 0 3px rgba(0,0,0,.1);
+    -moz-box-shadow: 0 0 3px rgba(0,0,0,.1);
+    box-shadow: 0 0 3px rgba(0,0,0,.1);
+    -webkit-transform-origin: 50%0;
+    transform-origin: 50%0;
+    -webkit-transform: scale3d(1,1,1);
+    transform: scale3d(1,1,1);
+    -webkit-transition: none;
+    transition: none;
+    -webkit-animation: expand .8s .6s ease-out forwards;
+    animation: expand .8s .6s ease-out forwards;
+    opacity: 0
+}
+
+.form_wrapper h2,.form_wrapper h3 {
+    font-size: 1.5em;
+    line-height: 1.5em;
+    margin: 0
+}
+
+.form_wrapper .title_container {
+    text-align: center;
+    padding-bottom: 15px
+}
+
+.form_wrapper h3 {
+    font-size: 1.1em;
+    font-weight: 400
+}
+
+.form_wrapper label {
+    font-size: 12px
+}
+
+.form_wrapper .row {
+    margin: 10px -15px
+}
+
+.form_wrapper .row>div {
+    padding: 0 15px;
+    box-sizing: border-box
+}
+
+.form_wrapper .col_half {
+    width: 50%;
+    float: left
+}
+
+.form_wrapper .input_field {
+    position: relative;
+    padding: 20px;
+    margin-bottom: 20px;
+    width: 50%;
+    -webkit-animation: bounce .6s ease-out;
+    animation: bounce .6s ease-out;
+    display: block;
+    float: right
+}
+
+.form_wrapper .left {
+    float: left
+}
+
+.form_wrapper .right {
+    float: right
+}
+
+.form_wrapper .input_field>span {
+    position: relative;
+    padding: 10px;
+    left: 0;
+    top: 0;
+    color: #333;
+    text-align: center;
+    display: block
+}
+
+.form_wrapper .input_field>span>input {
+    width: 120%
+}
+
+.form_wrapper .input_field>span>i {
+    position: absolute;
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-right: 20px;
+    width: 10%;
+    border-right: 1px solid #ccc;
+    height: 35px
+}
+
+.form_wrapper .input_field_centered {
+    position: relative;
+    padding: 40px;
+    margin-bottom: 20px;
+    width: 50%;
+    -webkit-animation: bounce .6s ease-out;
+    animation: bounce .6s ease-out;
+    display: contents;
+    /*float: right*/
+}
+
+.form_wrapper .fa-lock {
+    position: absolute;
+    border-right: 1px solid #ccc;
+    padding-left: 10px;
+    padding-top: 10px;
+    padding-right: 20px;
+    height: 35px;
+    width: 40px;
+    padding: 15px;
+}
+
+.form_wrapper .page {
+    margin-bottom: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.form_wrapper .area_label {
+    position: relative;
+    text-align: center;
+    padding-top: 10px;
+    width: 100%;
+    float: left;
+    margin: 5px;
+    display: block
+}
+
+.form_wrapper .textarea_field>span>i {
+    padding-top: 10px
+}
+
+.form_wrapper input[type=datetime-local],.form_wrapper input[type=email],.form_wrapper input[type=password],.form_wrapper input[type=text] {
+    width: 100%;
+    padding: 8px 10px 9px 35px;
+    height: 35px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    outline: 0;
+    -webkit-transition: all .3s ease-in-out;
+    -moz-transition: all .3s ease-in-out;
+    -ms-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out
+}
+
+.form_wrapper input[type=email]:hover,.form_wrapper input[type=password]:hover,.form_wrapper input[type=text]:hover {
+    background: #fafafa
+}
+
+.form_wrapper input[type=email]:focus,.form_wrapper input[type=password]:focus,.form_wrapper input[type=text]:focus {
+    -webkit-box-shadow: 0 0 2px 1px rgba(255,169,0,.5);
+    -moz-box-shadow: 0 0 2px 1px rgba(255,169,0,.5);
+    box-shadow: 0 0 2px 1px rgba(255,169,0,.5);
+    border: 1px solid #f5ba1a;
+    background: #fafafa
+}
+
+.form_wrapper input[type=submit] {
+    background: #f5ba1a;
+    height: 35px;
+    line-height: 35px;
+    width: 100%;
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    color: #fff;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    -webkit-transition: all .3s ease-in-out;
+    -moz-transition: all .3s ease-in-out;
+    -ms-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out
+}
+
+.form_wrapper input[type=submit]:hover {
+    background: #e1a70a
+}
+
+.form_wrapper input[type=submit]:focus {
+    background: #e1a70a
+}
+
+.form_wrapper input[type=checkbox],.form_wrapper input[type=radio] {
+    padding-top: 10px;
+    margin-left: 105px;
+    height: 35px;
+    width: 35px
+}
+
+.form_wrapper .input_field .defect_checkbox {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start
+}
+
+.form_container .row .col_half.last {
+    border-left: 1px solid #ccc
+}
+
+.checkbox_option label {
+    margin-right: 1em;
+    position: relative
+}
+
+.checkbox_option label:before {
+    content: "";
+    display: inline-block;
+    width: .5em;
+    height: .5em;
+    margin-right: .5em;
+    vertical-align: -2px;
+    border: 2px solid #ccc;
+    padding: .12em;
+    background-color: transparent;
+    background-clip: content-box;
+    transition: all .2s ease
+}
+
+.checkbox_option label:after {
+    border-right: 2px solid #000;
+    border-top: 2px solid #000;
+    content: "";
+    height: 20px;
+    left: 2px;
+    position: absolute;
+    top: 7px;
+    transform: scaleX(-1) rotate(135deg);
+    transform-origin: left top;
+    width: 7px;
+    display: none
+}
+
+.checkbox_option input:hover+label:before {
+    border-color: #000
+}
+
+.checkbox_option input:checked+label:before {
+    border-color: #000
+}
+
+.checkbox_option input:checked+label:after {
+    -moz-animation: check .8s ease 0s running;
+    -webkit-animation: check .8s ease 0s running;
+    animation: check .8s ease 0s running;
+    display: block;
+    width: 7px;
+    height: 20px;
+    border-color: #000
+}
+
+.select_option {
+    position: relative;
+    width: 100%
+}
+
+.select_option select {
+    display: inline-block;
+    width: 100%;
+    height: 35px;
+    padding: 0 15px;
+    cursor: pointer;
+    color: #7b7b7b;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    background: #fff;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    transition: all .2s ease
+}
+
+.select_option select::-ms-expand {
+    display: none
+}
+
+.select_option select:focus,.select_option select:hover {
+    color: #000;
+    background: #fafafa;
+    border-color: #000;
+    outline: 0
+}
+
+.select_arrow {
+    position: absolute;
+    top: calc(50% - 4px);
+    right: 30px;
+    top: 75px;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    border-width: 8px 5px 0;
+    border-style: solid;
+    border-color: #7b7b7b transparent transparent
+}
+
+.select_option select:focus+.select_arrow,.select_option select:hover+.select_arrow {
+    border-top-color: #000
+}
+
+.form_wrapper .input_field.defect_checkbox,.form_wrapper .select_option.test_type_options {
+    width: 100%;
+    float: none
+}

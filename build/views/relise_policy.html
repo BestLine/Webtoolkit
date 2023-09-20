@@ -1,0 +1,48 @@
+<div class="form_wrapper">
+    <div class="form_container">
+        <div class="title_container">
+            <h2>Сравнение релизов</h2>
+        </div>
+        <div class="row clearfix">
+            <div class="">
+                <form class="formWithValidation" id="MakeReport">
+                    <div class="input_field">
+                        <p class="area_label">Версия</p>
+                        <span>
+                            <i class="fa fa-clock"></i>
+                            <input type="text" class="version" id="Version_options" name="VersionInput">
+                        </span>
+                    </div>
+                    <div class="input_field select_option bucke">
+                        <p class="area_label">Бакет</p>
+                        <select class='bucket field' id="bucket_options">
+                            {{ unescape .Buckets}}
+                        </select>
+                        <div class="select_arrow"></div>
+                    </div>
+                    <div class="input_field select_option proj">
+                        <p class="area_label">Аппликейшн</p>
+                        <select class="project field" id="project_options">
+                            {{ unescape .Projects}}
+                        </select>
+                    </div>
+                    <div class="input_field checkbox-wrapper">
+                        <p class="area_label">Присутствие дефекта</p>
+                        <input class="defect" type="checkbox" id="defect_checkbox">
+                    </div>
+                    <div class="input_field select_option test_type_col">
+                        <p class="area_label">Тип теста</p>
+                        <select class="test_type field " id="test_type_options">
+                            <option value="max_perf">Max Perf</option>
+                            <option value="stability">Stability</option>
+                            <option value="confirmation">Confirmation</option>
+                        </select>
+                        <div class="select_arrow"></div>
+                    </div>
+                    <input class="make_report_button" id="test2" type="submit" value="Сравнить" />
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="error_message"></div>
+</div>

@@ -1,0 +1,24 @@
+<div class="current_tests">
+  <style>
+    .current_tests {
+      margin-left: 200px;
+      margin-top: 20px;
+      width: 90%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .current_tests table {
+      width: 100%;
+      margin-left: 20px;
+    }
+    .current_tests table button {
+      border-radius: 5px;
+    }
+  </style>
+  <div style="filter: blur(5px)">
+  <h2>Текущие запущенные тесты</h2>
+  {{unescape .CurrentTests}}
+  </div>
+</div>

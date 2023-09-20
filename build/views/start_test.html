@@ -1,0 +1,36 @@
+<div class="form_wrapper">
+    <div class="form_container">
+        <div class="title_container">
+            <h2>Запуск теста</h2>
+        </div>
+        <div class="row clearfix">
+            <div class="">
+                <form class="formWithValidation" id="SetReportHomePage">
+                    <div class="input_field select_option">
+                        <p class="area_label">Бакет</p>
+                        <select class='bucket field' id="bucket_options">
+                            {{ unescape .Buckets}}
+                        </select>
+                        <div class="select_arrow"></div>
+                    </div>
+                    <div class="input_field left">
+                        <p class="area_label">Сценарий</p>
+                        <span>
+                            <i class="fa fa-clock"></i>
+                            <input type="text" class="version" id="Version_options" name="VersionInput">
+                        </span>
+                    </div>
+                    <div class="input_field_centered">
+                        <p class="area_label">Проект</p>
+                        <span>
+                            <i class="fa fa-lock"></i>
+                            <input class="page field" type="text" id="page_options" name="firsttime" placeholder="Например: 112334564" required />
+                        </span>
+                    </div>
+                    <input class="button" type="submit" value="Запустить тест" />
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="error_message"></div>
+</div>

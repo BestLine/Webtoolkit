@@ -1,0 +1,37 @@
+<div class="form_wrapper">
+    <div class="form_container">
+        <div class="title_container">
+            <h2>Comparing tests</h2>
+        </div>
+        <div class="row clearfix">
+            <div class="">
+                <form class="formWithValidation" id="CompareReport">
+
+                    <div class="input_field">
+                        <p class="area_label">First time</p>
+                        <span>
+                            <i class="fa fa-clock"></i>
+                            <input class="StartTime field" type="datetime-local" id="ftime" name="firsttime" placeholder="Test start time" required />
+                        </span>
+                    </div>
+
+                    <div class="input_field">
+                        <p class="area_label">Second time</p>
+                        <span>
+                            <i class="fa fa-clock"></i>
+                            <input class="EndTime field" type="datetime-local" id="stime" name="secondtime" placeholder="Test end time" required />
+                        </span>
+                    </div>
+                    <div class="input_field select_option">
+                        <p class="area_label">Select bucket</p>
+                        <select class='bucket field' id="bucket_options">
+                            {{ unescape .Buckets}}
+                        </select>
+                        <div class="select_arrow"></div>
+                    </div>
+                    <input class="button" type="submit" value="Compare" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border: 5px solid #fff;
+    border-top: 5px solid #fff;
+    border-bottom: 3px solid #fff;
+    border-collapse: collapse;
+    outline: 3px solid #ffd518;
+    font-size: 12px;
+    background: #fff!important
+}
+
+table td,table th {
+    padding: 7px;
+    border: 0;
+    border-top: 3px solid #fff
+}
+
+table th {
+    font-weight: 700;
+    background: #ffd518;
+    text-align: left;
+    font-size: 17px;
+    border-bottom: 3px solid #ffd518
+}
+
+table td {
+    border-bottom: 3px solid #fff;
+    font-size: 12px;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd
+}
+
+table tbody tr:nth-child(even) {
+    background: #f8f8f8!important
+}

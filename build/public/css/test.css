@@ -1,0 +1,47 @@
+.top_panel{
+    height: 5%;
+    width: 100%;
+    border: 1px solid black;
+    overflow: hidden;
+    background-color: #f1f1f1;
+}
+
+.left_panel {
+    display: block;
+    position: absolute;
+    width: 10%;
+    margin-top: 10px;
+    height: 85vh;
+    border: 1px solid red;
+}
+.top_nav_button {
+    background-color: #ddd;
+    /*padding-left: 25px;*/
+    float: left;
+    width: calc(100% / 5);
+    /*width: 15%;*/
+    height: 100%;
+    padding: 14px 16px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.left_nav_button {
+    float: top;
+    height: 10%;
+    padding: 14px 16px;
+    font-size: 14px;
+    width: 100%;
+    padding-bottom: 10px;
+    overflow: hidden;
+}
+
+.content {
+    display: block;
+    position: absolute;
+    border: 1px solid blue;
+    margin-left: 11%;
+    margin-top: 10px;
+    height: 90%;
+    width: 87%;
+}

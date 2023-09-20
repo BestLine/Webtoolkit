@@ -1,0 +1,17 @@
+<style>
+  .test_history_main {
+    width: 100%;
+  }
+  .test_history_main table {
+    width: 100%;
+    height: 90%;
+    border: 5px solid black;
+  }
+  .test_history_main h2 {
+    text-align: center;
+  }
+</style>
+<div class="test_history_main">
+  <h2>История проведённых тестов</h2>
+    {{ unescape .Table_reports}}
+</div>
