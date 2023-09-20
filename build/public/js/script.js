@@ -45,6 +45,7 @@ function test(){
 				updateListVersions()
 				document.getElementById("btn_set_project").addEventListener('click', setActiveProject)
 				document.getElementById("btn_set_methodic").addEventListener('click', handleMetodicSet)
+				document.getElementById("btn_set_version").addEventListener('click', handleVersionAdd)
 				// document.getElementById("settings_version_list").addEventListener('change', updateListVersions)
 
 			});
@@ -244,6 +245,21 @@ function handleMetodicSet(event) {
 	xhr.send(JSON.stringify(data));
 	let msg = form.querySelector('.msg')
 	msg.textContent = 'методика привязана'
+}
+
+function handleVersionAdd(event) {
+	let form = document.querySelector('.settings_page')
+	let version = form.querySelector('#set_version')
+	let xhr = new XMLHttpRequest();
+	let data = {};
+	event.preventDefault()
+	data["version"] = version.value
+	console.log("JSON: ", JSON.stringify(data))
+	xhr.open("POST", "beeload/add/version", true);
+	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+	xhr.send(JSON.stringify(data));
+	let msg = form.querySelector('.msg')
+	msg.textContent = 'новая версия создана'
 }
 
 function handleSetReportHomepage(event) {

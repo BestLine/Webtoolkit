@@ -32,8 +32,8 @@ func setupProtectedRoutes(app *fiber.App) {
 	app.Post("/beeload/create/bucket", checkUserPermission, createBucket)
 	app.Post("/beeload/compare/release", compareRelease)
 	app.Post("/beeload/set/project", setActiveUserProject)
-	//app.Post("/beeload/add/methodic") // TODO: добавить обработку методики
-	//app.Post("beeload/add/version")   // TODO: добавить обработку дополнения версии
+	app.Post("/beeload/add/methodic", addMethodic) // TODO: добавить обработку методики
+	app.Post("beeload/add/version", addVersion)    // TODO: добавить обработку дополнения версии
 	app.Get("/", startPage)
 	app.Get("/main_page", getMainPage)
 	app.Get("/compare", getCompare)
@@ -62,8 +62,7 @@ func main() {
 	}
 
 	// часть отвечающая за логи //
-	//InitLogger(viper.GetBool("server.debug"))
-	InitLogger(viper.GetBool("server.debug"), viper.GetString("server.log_level"))
+	InitLogger(viper.GetBool("server.debug"), viper.GetString("server.log_level"), viper.GetString("server.log_filename"))
 
 	engine := html.New("build/views", ".html")
 	engine.AddFunc(
@@ -116,9 +115,6 @@ func loginHandler(c *fiber.Ctx) error {
 	check, err := checkUserCredentials(db, username, password)
 	if !check {
 		logrus.Error("Invalid credentials! Username: ", username, " PWD: ", password)
-		//return c.Status(http.StatusUnauthorized).JSON(fiber.Map{
-		//	"message": "Invalid credentials",
-		//})
 		return c.Render("login",
 			fiber.Map{"error": "Не верное имя пользователя или пароль!"})
 	}
@@ -130,7 +126,7 @@ func loginHandler(c *fiber.Ctx) error {
 	claims["role"] = role
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix() // токен действителен в течение 24 часов
 
-	tokenString, err := token.SignedString([]byte("secret")) // здесь можно использовать свой секретный ключ
+	tokenString, err := token.SignedString([]byte("secret"))
 	cookie := fiber.Cookie{
 		Name:     "jwt",
 		Value:    tokenString,
@@ -171,13 +167,6 @@ func jwtMiddleware() func(*fiber.Ctx) error {
 		role, ok := (*claims)["role"].(string)
 		logrus.Debug("role = ", role)
 		logrus.Debug("role check!")
-		//if !ok || role != "user" {
-		//	logrus.Error("Access denied. You don't have the necessary permissions.")
-		//	return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-		//		"message": "Access denied. You don't have the necessary permissions.",
-		//	})
-		//}
-
 		c.Locals("user", claims)
 		return c.Next()
 	}
@@ -244,7 +233,7 @@ func addDataForBeeLoad(c *fiber.Ctx) error {
 	//c.Body()
 	//json.Unmarshal(c.Body(), &req)
 	//pgAddInfo(req.Bucket, req.ID)
-	return nil
+	return nil //TODO: реалиация
 }
 
 func compareData(c *fiber.Ctx) error {
@@ -254,7 +243,7 @@ func compareData(c *fiber.Ctx) error {
 	//json.Unmarshal(c.Body(), &req)
 	//fmt.Println(req)
 	//confTestReport(req.Application, req.Bucket, req.ApplicationC)
-	return nil
+	return nil //TODO: реалиация
 }
 
 func compareRelease(c *fiber.Ctx) error {
@@ -282,10 +271,7 @@ func getMainPage(c *fiber.Ctx) error {
 			"Table_tests":  get_current_tests(GetTableDataTests(c)),
 			"Table_status": get_status_table(GetTableDataStatus(c)),
 		})
-	return nil
 }
-
-//TODO: поправить поменять местами project = bucket, bucket = тест
 
 func getCurrentTests(c *fiber.Ctx) error {
 	logrus.Debug("getCurrentTests")
@@ -361,6 +347,7 @@ func setActiveUserProject(c *fiber.Ctx) error {
 	db := getDbConn()
 	bucket := new(Project)
 	if err := c.BodyParser(bucket); err != nil {
+		logrus.Error(err)
 		return err
 	}
 	logrus.Debug("Project = ", bucket.Name)
@@ -373,6 +360,24 @@ func setActiveUserProject(c *fiber.Ctx) error {
 	return c.Render("settings",
 		fiber.Map{"ActiveProject": make_settings_projects_list(activeProject, projectsList)})
 }
+
+func addVersion(c *fiber.Ctx) error {
+	version := new(Version)
+	if err := c.BodyParser(version); err != nil {
+		logrus.Error(err)
+		return err
+	}
+	return nil
+} //TODO: COMPLETE
+
+func addMethodic(c *fiber.Ctx) error {
+	methodic := new(MethodicSet)
+	if err := c.BodyParser(methodic); err != nil {
+		logrus.Error(err)
+		return err
+	}
+	return nil
+} //TODO: COMPLETE
 
 func getReportHistory(c *fiber.Ctx) error {
 	logrus.Debug("getReportHistory")

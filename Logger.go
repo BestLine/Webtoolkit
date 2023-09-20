@@ -5,13 +5,13 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-func InitLogger(debug bool, level string) {
+func InitLogger(debug bool, level string, filename string) {
 	logRotation := &lumberjack.Logger{
-		Filename:   "./frontend.log", // Имя файла для записи логов
-		MaxSize:    100,              // Максимальный размер файла логов в мегабайтах до ротации
-		MaxBackups: 3,                // Максимальное количество ротированных файлов
-		MaxAge:     28,               // Максимальное количество дней хранения ротированных файлов
-		Compress:   true,             // Архивировать старые лог-файлы
+		Filename:   filename, // Имя файла для записи логов
+		MaxSize:    100,      // Максимальный размер файла логов в мегабайтах до ротации
+		MaxBackups: 3,        // Максимальное количество ротированных файлов
+		MaxAge:     28,       // Максимальное количество дней хранения ротированных файлов
+		Compress:   true,     // Архивировать старые лог-файлы
 	}
 
 	logrus.SetFormatter(&logrus.TextFormatter{

@@ -18,31 +18,9 @@ func GetTableDataReports(c *fiber.Ctx, project string, count int) JSONData {
 	} else {
 		url = "/beeload/get/tableDataReports?&count=10"
 	}
-	//url := "/beeload/get/tableDataReports"
 	logrus.Debug("url: ", url)
 	res := sendGet(c, url)
-	json.Unmarshal([]byte(res), &data)
-	//
-	//dataStr := string(res)
-	//
-	//// Разбиваем на строки
-	//rows := strings.Split(dataStr, "},{")
-	//
-	//// Подготовка для парсинга
-	//var data [][]string
-	//for _, row := range rows {
-	//	// Удаление лишних символов
-	//	row = strings.Trim(row, "[{]}")
-	//	// Разбиваем на элементы
-	//	items := strings.Split(row, ",")
-	//	var itemStrings []string
-	//	for _, item := range items {
-	//		item = strings.Trim(item, "\" ")
-	//		itemStrings = append(itemStrings, item)
-	//	}
-	//	data = append(data, itemStrings)
-	//}
-	//fmt.Println("DATA:   ", data.Data[0].Application)
+	json.Unmarshal(res, &data)
 	return data
 }
 
@@ -50,11 +28,7 @@ func GetTableDataTests(c *fiber.Ctx) [][]string {
 	logrus.Debug("GetTableDataTests")
 	url := "/beeload/get/tableDataTests"
 	res := sendGet(c, url)
-	//fmt.Println(res)
-	// расшифровка ответа
 	dataStr := string(res)
-
-	// Разбиваем на строки
 	rows := strings.Split(dataStr, "},{")
 
 	// Подготовка для парсинга
@@ -216,18 +190,7 @@ func get_bucket_list(c *fiber.Ctx) []string {
 		fmt.Println("Error:", err)
 		return nil
 	}
-
-	// Извлечение значений "Bucket" и создание []string
-	var buckets []string
-	for _, item := range data {
-		if bucket, found := item["Bucket"]; found {
-			buckets = append(buckets, bucket)
-		}
-	}
-
-	// Вывод результатов
-	fmt.Println(buckets)
-	return buckets
+	return dataToListOfStrings(data, "Bucket")
 }
 
 func get_project_list(c *fiber.Ctx) []string {
@@ -239,18 +202,7 @@ func get_project_list(c *fiber.Ctx) []string {
 		fmt.Println("Error:", err)
 		return nil
 	}
-
-	// Извлечение значений "Bucket" и создание []string
-	var projects []string
-	for _, item := range data {
-		if project, found := item["Project"]; found {
-			projects = append(projects, project)
-		}
-	}
-
-	// Вывод результатов
-	fmt.Println(projects)
-	return projects
+	return dataToListOfStrings(data, "Project")
 }
 
 func get_versions_list(c *fiber.Ctx, project string) []string {
@@ -263,62 +215,45 @@ func get_versions_list(c *fiber.Ctx, project string) []string {
 		fmt.Println("Error:", err)
 		return nil
 	}
-	var versions []string
-	for _, item := range data {
-		if version, found := item["Version"]; found {
-			versions = append(versions, version)
-		}
-	}
-	fmt.Println(versions)
-	return versions
+	return dataToListOfStrings(data, "Version")
 }
 
 func get_project_buckets(c *fiber.Ctx, project string) []string {
-	fmt.Println(`Project: `, project)
+	logrus.Debug("get_project_buckets Project: ", project)
 	url := "/beeload/get/bucketList?project=" + project
 	res := sendGet(c, url)
+	logrus.Debug("URL: ", url)
 	var data []map[string]string
 	err := json.Unmarshal([]byte(res), &data)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return nil
 	}
-
-	// Извлечение значений "Bucket" и создание []string
-	var buckets []string
-	for _, item := range data {
-		if bucket, found := item["Bucket"]; found {
-			buckets = append(buckets, bucket)
-		}
-	}
-
-	// Вывод результатов
-	fmt.Println(buckets)
-	return buckets
+	return dataToListOfStrings(data, "Bucket")
 }
 
 func get_bucket_projects(c *fiber.Ctx, bucket string) []string {
-	fmt.Println(`Bucket: `, bucket)
+	logrus.Debug("get_bucket_projects Bucket: ", bucket)
 	url := "/beeload/get/bucketList?bucket=" + bucket
 	res := sendGet(c, url)
+	logrus.Debug("URL: ", url)
 	var data []map[string]string
 	err := json.Unmarshal([]byte(res), &data)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return nil
 	}
+	return dataToListOfStrings(data, "Bucket")
+}
 
-	// Извлечение значений "Bucket" и создание []string
-	var buckets []string
+func dataToListOfStrings(data []map[string]string, name string) []string {
+	var res []string
 	for _, item := range data {
-		if bucket, found := item["Bucket"]; found {
-			buckets = append(buckets, bucket)
+		if thing, found := item[name]; found {
+			res = append(res, thing)
 		}
 	}
-
-	// Вывод результатов
-	fmt.Println(buckets)
-	return buckets
+	return res
 }
 
 func add_tags(imp_list []string) string {

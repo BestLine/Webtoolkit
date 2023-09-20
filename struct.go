@@ -11,6 +11,16 @@ type Project struct {
 	Name string `json:"project"`
 }
 
+type Version struct {
+	Name string `json:"version"`
+}
+
+type MethodicSet struct {
+	Bucket  string `json:"bucket"`
+	Version string `json:"version"`
+	Page    string `json:"page"`
+}
+
 type User struct {
 	ID       int
 	Username string
