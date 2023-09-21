@@ -25,17 +25,17 @@
       <div class="">
         <form class="formWithValidation" action="/login" method="post">
           <div class="input_field">
-            <p class="area_label">Пароль</p>
-            <span>
-              <i class="fa fa-clock"></i>
-              <input type="password" id="password" name="password" autocomplete="current-password" required>
-            </span>
-          </div>
-          <div class="input_field">
             <p class="area_label">Имя пользователя</p>
             <span>
               <i class="fa fa-clock"></i>
               <input type="text" id="username" name="username" autocomplete="username" required>
+            </span>
+          </div>
+          <div class="input_field">
+            <p class="area_label">Пароль</p>
+            <span>
+              <i class="fa fa-clock"></i>
+              <input type="password" id="password" name="password" autocomplete="current-password" required>
             </span>
           </div>
           <h2 class="error">{{.error}}</h2>
