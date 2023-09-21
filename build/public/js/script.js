@@ -1,39 +1,13 @@
 // ---------Responsive-navbar-active-animation-----------
 function test(){
-	let tabsNewAnim = $('#navbarSupportedContent');
-	let selectorNewAnim = $('#navbarSupportedContent').find('li').length;
-	$( "#wrapper" ).load( "/main_page" );
-	let activeItemNewAnim = tabsNewAnim.find('.active');
-	let activeWidthNewAnimHeight = activeItemNewAnim.innerHeight();
-	let activeWidthNewAnimWidth = activeItemNewAnim.innerWidth();
-	let itemPosNewAnimTop = activeItemNewAnim.position();
-	let itemPosNewAnimLeft = activeItemNewAnim.position();
 	const buttons = document.querySelectorAll('.l_btn');
-	var ev_type
-	$(".hori-selector").css({
-		"top":itemPosNewAnimTop.top + "px",
-		"left":itemPosNewAnimLeft.left + "px",
-		"height": activeWidthNewAnimHeight + "px",
-		"width": activeWidthNewAnimWidth + "px"
-	});
 	$("#navbarSupportedContent").on("click","li",function(e){
-		$('#navbarSupportedContent ul li').removeClass("active");
 		if (e.target.textContent!=="Выход") {
+			$('#navbarSupportedContent ul li').removeClass("active");
 			$(this).addClass('active');
 			e.preventDefault();
-
 			toggleNavbarLeft(e)
 		}
-		let activeWidthNewAnimHeight = $(this).innerHeight();
-		let activeWidthNewAnimWidth = $(this).innerWidth();
-		let itemPosNewAnimTop = $(this).position();
-		let itemPosNewAnimLeft = $(this).position();
-		$(".hori-selector").css({
-			"top":itemPosNewAnimTop.top + "px",
-			"left":itemPosNewAnimLeft.left + "px",
-			"height": activeWidthNewAnimHeight + "px",
-			"width": activeWidthNewAnimWidth + "px"
-		});
 		if (e.target.textContent==="Главная"){
 			$( "#wrapper" ).load( "/main_page" );
 		} else if (e.target.textContent === "Управление отчётами") {
@@ -41,12 +15,12 @@ function test(){
 			e.target.classList.add('active');
 			$( "#wrapper" ).load( "/make_report", function() {
 				document.querySelector('.formWithValidation').addEventListener('submit', handleMakeReport)
+				document.querySelector('.EndTime').addEventListener('change', checkTime)
+				document.querySelector('.StartTime').addEventListener('change', checkTime)
 				document.querySelector('.proj').addEventListener("change", function(event) {
 					const ev_type = "bucket"
 					updateDataPage(event, ev_type)
 				});
-				// document.querySelector('.proj').addEventListener("change", updateDataPage)
-				// document.querySelector('.proj').addEventListener("change", updateListBuckets)
 			})
 		} else if (e.target.textContent === "Управление тестами") {
 			$( "#wrapper" ).load( "/current_tests", function () {
@@ -55,7 +29,6 @@ function test(){
 		} else if (e.target.textContent === "Настройки проектов") {
 			$("#wrapper").load("/settings", function () {
 				updateDataPage(event, "versions")
-				// updateListVersions()
 				document.getElementById("btn_set_project").addEventListener('click', setActiveProject)
 				document.getElementById("btn_set_methodic").addEventListener('click', handleMetodicSet)
 				document.getElementById("btn_set_version").addEventListener('click', handleVersionAdd)
@@ -63,6 +36,23 @@ function test(){
 
 			});
 		}
+	setTimeout(function() {anim(); }, 200);
+	});
+}
+
+function anim(e) {
+	console.log("ANIM!!")
+	let tabsNewAnim = $('#navbarSupportedContent');
+	let activeItemNewAnim = $('li.nav-item.active');
+	let activeWidthNewAnimHeight = activeItemNewAnim.innerHeight();
+	let activeWidthNewAnimWidth = activeItemNewAnim.innerWidth();
+	let itemPosNewAnimTop = activeItemNewAnim.position();
+	let itemPosNewAnimLeft = activeItemNewAnim.position();
+	$(".hori-selector").css({
+		"top":itemPosNewAnimTop.top + "px",
+		"left":itemPosNewAnimLeft.left + "px",
+		"height": activeWidthNewAnimHeight + "px",
+		"width": activeWidthNewAnimWidth + "px"
 	});
 }
 
@@ -83,8 +73,6 @@ function NavbarLeftHandler() {
 					const ev_type = "bucket"
 					updateDataPage(event, ev_type)
 				});
-				// document.querySelector('.proj').addEventListener("change", updateDataPage)
-				// document.querySelector('.proj').addEventListener("change", updateListBuckets)
 			})
 		} else if (button_text === "Создать бакет") {
 			$( "#wrapper" ).load( "/create_bucket", function () {
@@ -101,8 +89,6 @@ function NavbarLeftHandler() {
 					const ev_type = "projects"
 					updateDataPage(event, ev_type)
 				});
-				// document.querySelector('.bucke').addEventListener("change", updateDataPage)
-				// document.querySelector('.bucke').addEventListener("change", updateListProjects)
 			})
 		} else if (button_text === "Сравнение тестов") {
 			$( "#wrapper" ).load( "/compare_release", function() {
@@ -111,7 +97,6 @@ function NavbarLeftHandler() {
 					const ev_type = "projects"
 					updateDataPage(event, ev_type)
 				});
-				// document.querySelector('.bucke').addEventListener("change", updateListProjects)
 			})
 		}
 		///////////// Управление тестами /////////////
@@ -417,6 +402,19 @@ function handleCompare(event) {
 	xhr.send(JSON.stringify(data));
 }
 
+function checkTime() {
+	let form = document.querySelector('.formWithValidation')
+	let startTimeInput = form.querySelector('.StartTime')
+	let endTimeInput = form.querySelector('.EndTime')
+	const startTime = new Date(startTimeInput.value);
+	const endTime = new Date(endTimeInput.value);
+
+	if (startTime > endTime) {
+		alert("Время начала не может быть больше времени завершения.");
+		startTimeInput.value = ""; // Очищаем поле времени начала
+	}
+}
+
 function handleMakeReport(event) {
 	let form = document.querySelector('.formWithValidation')
 	let bucket = form.querySelector('#bucket_options')
@@ -471,41 +469,30 @@ function toTimestamp(strDate){
 	return datum/1000;
 }
 
-$(document).on('DOMContentLoaded', function($){
-	// const mainNavLink = document.getElementById("mainNavLink");
-	// mainNavLink.classList.add("active");
-	setTimeout(function(){ test(); });
-});
-$(window).on('resize', function(){
-	setTimeout(function(){ test(); }, 500);
-});
-$(".navbar-toggler").click(function(){
-	$(".navbar-collapse").slideToggle(300);
-	setTimeout(function(){ test(); });
+$(document).ready(function(){
+	$( "#wrapper" ).load( "/main_page" );
+	setTimeout(function() {anim(); }, 200);
+	setTimeout(function(){ test(); }, 100);
+	$(window).on('resize', function() {
+		setTimeout(function(){ anim(); }, 500);
+	});
+	$(".navbar-toggler").click(function(){
+		$(".navbar-collapse").slideToggle(300);
+		setTimeout(function(){ test(); });
+	});
 });
 
 // --------------add active class-on another-page move----------
-$(window).on('DOMContentLoaded',function () {
-	// Get current path and find target link
-	let path = window.location.pathname.split("/").pop();
-
-	// Account for home page with empty path
-	if (path == '') {
-		path = '/';
-	}
-	console.log("path = " + path);
-
-	let target = $('#mainNavLink');
-	// let target = $('#navbarSupportedContent ul li a[href="' + path + '"]');
-	// Add active class to target link
-	target.parent().addClass('active');
-
-	// Проверяем, был ли уже выполнен .load()
-
-});
-
-
-
+// jQuery(document).ready(function($){
+// 	let path = window.location.pathname.split("/").pop();
+// 	if (path == '') {
+// 		path = '/';
+// 	}
+// 	console.log("path = " + path);
+// 	let target = $('#mainNavLink');
+// 	// Add active class to target link
+// 	target.parent().addClass('active');
+// });
 
 // Add active class on another page linked
 // ==========================================
@@ -523,27 +510,4 @@ $(window).on('DOMContentLoaded',function () {
 //             $this.parent().removeClass('active');
 //         }
 //     })
-// });
-
-
-
-// document.querySelector('#a_background').addEventListener("change", function() {
-// 	let xhr = new XMLHttpRequest();
-// 	let data = {};
-// 	let new_options = [];
-// 	data["project"] = this.value
-// 	xhr.open("POST", "/get_project_buckets", true);
-// 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-// 	xhr.onreadystatechange = function() {
-// 		if (xhr.readyState === XMLHttpRequest.DONE) {
-// 			new_options = xhr.responseText;
-// 		}
-// 	}
-// 	xhr.send(JSON.stringify(data));
-// 	$('yourSelectList').empty();
-// 	$each(new_options, function(value) {
-// 		new Element('option')
-// 			.set('text', value)
-// 			.inject($('yourSelectList'));
-// 	});
 // });

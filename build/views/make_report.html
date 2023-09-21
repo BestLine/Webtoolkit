@@ -7,25 +7,18 @@
             <div class="">
                 <form class="formWithValidation" id="MakeReport">
                     <div class="input_field">
-                        <p class="area_label">Время завершения</p>
-                        <span>
-                            <i class="fa fa-clock"></i>
-                            <input class="EndTime field" type="datetime-local" id="ftime" name="firsttime" placeholder="Your first time" required />
-                        </span>
-                    </div>
-                    <div class="input_field">
                         <p class="area_label">Время начала</p>
                         <span>
                             <i class="fa fa-clock"></i>
                             <input class="StartTime field" type="datetime-local" id="stime" name="secondtime" placeholder="Your second time" required />
                         </span>
                     </div>
-                    <div class="input_field select_option bucket">
-                        <p class="area_label">Выберите бакет</p>
-                        <select class='bucket field' id="bucket_options" required>
-                            {{ unescape .Buckets}}
-                        </select>
-                        <div class="select_arrow"></div>
+                    <div class="input_field">
+                        <p class="area_label">Время завершения</p>
+                        <span>
+                            <i class="fa fa-clock"></i>
+                            <input class="EndTime field" type="datetime-local" id="ftime" name="firsttime" placeholder="Your first time" required />
+                        </span>
                     </div>
                     <div class="input_field select_option proj">
                         <p class="area_label">Выберите проект</p>
@@ -34,31 +27,16 @@
                         </select>
                         <div class="select_arrow"></div>
                     </div>
+                    <div class="input_field select_option bucket">
+                        <p class="area_label">Выберите бакет</p>
+                        <select class='bucket field' id="bucket_options" required>
+                            {{ unescape .Buckets}}
+                        </select>
+                        <div class="select_arrow"></div>
+                    </div>
+
                     <input class="make_report_button" id="test2" type="submit" value="Создать отчёт" />
                 </form>
-                <script>
-                    // Получаем элементы input времени начала и завершения
-                    let form = document.querySelector('.formWithValidation')
-                    let startTimeInput = form.querySelector('.StartTime')
-                    let endTimeInput = form.querySelector('.EndTime')
-
-                    // Функция для проверки времени
-                    function checkTime() {
-                        const startTime = new Date(startTimeInput.value);
-                        const endTime = new Date(endTimeInput.value);
-
-                        if (startTime > endTime) {
-                            alert("Время начала не может быть больше времени завершения.");
-                            startTimeInput.value = ""; // Очищаем поле времени начала
-                        }
-                    }
-
-                    // Добавляем обработчик события при изменении времени начала
-                    startTimeInput.addEventListener("change", checkTime);
-
-                    // Добавляем обработчик события при изменении времени завершения
-                    endTimeInput.addEventListener("change", checkTime);
-                </script>
             </div>
         </div>
     </div>
