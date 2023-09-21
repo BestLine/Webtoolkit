@@ -2,6 +2,14 @@
 <html lang="en" >
 <head>
     <meta charset="UTF-8">
+{{/*    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>*/}}
+    <script
+            src="https://code.jquery.com/jquery-3.7.1.js"
+            integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+            crossorigin="anonymous"></script>
+    <script src='https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js'></script>
+    <script src="/js/script.js"></script>
     <title>BeeLoadToolkit</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css'>
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.css'>
@@ -19,29 +27,24 @@
         <ul class="navbar-nav ml-auto">
             <div class="hori-selector"><div class="left"></div><div class="right"></div></div>
             <li class="nav-item ">
-                <a class="nav-link active" href="/"><i class="fas fa-tachometer-alt"></i>Главная</a>
+                <a class="nav-link" id="mainNavLink" href="javascript:void(0);"><i class="fas fa-tachometer-alt"></i>Главная</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/make_report"><i class="far fa-address-book"></i>Управление отчётами</a>
+                <a class="nav-link" href="javascript:void(0);"><i class="far fa-address-book"></i>Управление отчётами</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/compare"><i class="far fa-address-book"></i>Управление тестами</a>
+                <a class="nav-link" href="javascript:void(0);"><i class="far fa-address-book"></i>Управление тестами</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/create_bucket"><i class="far fa-clone"></i>Настройки проектов</a>
+                <a class="nav-link" href="javascript:void(0);"><i class="far fa-clone"></i>Настройки проектов</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/logout"><i class="far fa-chart-bar"></i>Выход</a>
+                <a class="nav-link" href="javascript:void(0);"><i class="far fa-chart-bar"></i>Выход</a>
             </li>
         </ul>
     </div>
 </nav>
 <div class="navbar-left" id="navbarLeft"></div>
-<script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js'></script>
-<script src="/js/script.js"></script>
-<!--<script src="/js/mootoolscore160.js"></script>-->
 <div class="content" id="wrapper"></div>
 </body>
 </html>

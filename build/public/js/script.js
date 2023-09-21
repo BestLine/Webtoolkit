@@ -2,12 +2,14 @@
 function test(){
 	let tabsNewAnim = $('#navbarSupportedContent');
 	let selectorNewAnim = $('#navbarSupportedContent').find('li').length;
+	$( "#wrapper" ).load( "/main_page" );
 	let activeItemNewAnim = tabsNewAnim.find('.active');
 	let activeWidthNewAnimHeight = activeItemNewAnim.innerHeight();
 	let activeWidthNewAnimWidth = activeItemNewAnim.innerWidth();
 	let itemPosNewAnimTop = activeItemNewAnim.position();
 	let itemPosNewAnimLeft = activeItemNewAnim.position();
 	const buttons = document.querySelectorAll('.l_btn');
+	var ev_type
 	$(".hori-selector").css({
 		"top":itemPosNewAnimTop.top + "px",
 		"left":itemPosNewAnimLeft.left + "px",
@@ -19,14 +21,19 @@ function test(){
 		if (e.target.textContent!=="Выход") {
 			$(this).addClass('active');
 			e.preventDefault();
+
 			toggleNavbarLeft(e)
 		}
 		let activeWidthNewAnimHeight = $(this).innerHeight();
 		let activeWidthNewAnimWidth = $(this).innerWidth();
 		let itemPosNewAnimTop = $(this).position();
 		let itemPosNewAnimLeft = $(this).position();
-
-		// toggleNavbarLeft(e)
+		$(".hori-selector").css({
+			"top":itemPosNewAnimTop.top + "px",
+			"left":itemPosNewAnimLeft.left + "px",
+			"height": activeWidthNewAnimHeight + "px",
+			"width": activeWidthNewAnimWidth + "px"
+		});
 		if (e.target.textContent==="Главная"){
 			$( "#wrapper" ).load( "/main_page" );
 		} else if (e.target.textContent === "Управление отчётами") {
@@ -34,7 +41,12 @@ function test(){
 			e.target.classList.add('active');
 			$( "#wrapper" ).load( "/make_report", function() {
 				document.querySelector('.formWithValidation').addEventListener('submit', handleMakeReport)
-				document.querySelector('.proj').addEventListener("change", updateListBuckets)
+				document.querySelector('.proj').addEventListener("change", function(event) {
+					const ev_type = "bucket"
+					updateDataPage(event, ev_type)
+				});
+				// document.querySelector('.proj').addEventListener("change", updateDataPage)
+				// document.querySelector('.proj').addEventListener("change", updateListBuckets)
 			})
 		} else if (e.target.textContent === "Управление тестами") {
 			$( "#wrapper" ).load( "/current_tests", function () {
@@ -42,7 +54,8 @@ function test(){
 			});
 		} else if (e.target.textContent === "Настройки проектов") {
 			$("#wrapper").load("/settings", function () {
-				updateListVersions()
+				updateDataPage(event, "versions")
+				// updateListVersions()
 				document.getElementById("btn_set_project").addEventListener('click', setActiveProject)
 				document.getElementById("btn_set_methodic").addEventListener('click', handleMetodicSet)
 				document.getElementById("btn_set_version").addEventListener('click', handleVersionAdd)
@@ -50,13 +63,6 @@ function test(){
 
 			});
 		}
-
-		$(".hori-selector").css({
-			"top":itemPosNewAnimTop.top + "px",
-			"left":itemPosNewAnimLeft.left + "px",
-			"height": activeWidthNewAnimHeight + "px",
-			"width": activeWidthNewAnimWidth + "px"
-		});
 	});
 }
 
@@ -73,7 +79,12 @@ function NavbarLeftHandler() {
 		} else if (button_text === "Создать отчёт") {
 			$( "#wrapper" ).load( "/make_report", function() {
 				document.querySelector('.formWithValidation').addEventListener('submit', handleMakeReport)
-				document.querySelector('.proj').addEventListener("change", updateListBuckets)
+				document.querySelector('.proj').addEventListener("change", function(event) {
+					const ev_type = "bucket"
+					updateDataPage(event, ev_type)
+				});
+				// document.querySelector('.proj').addEventListener("change", updateDataPage)
+				// document.querySelector('.proj').addEventListener("change", updateListBuckets)
 			})
 		} else if (button_text === "Создать бакет") {
 			$( "#wrapper" ).load( "/create_bucket", function () {
@@ -86,12 +97,21 @@ function NavbarLeftHandler() {
 		} else if (button_text === "Привязать методику") {
 			$( "#wrapper" ).load( "/set_methodic", function() {
 				document.querySelector('.formWithValidation').addEventListener('submit', handleMetodicSet)
-				document.querySelector('.bucke').addEventListener("change", updateListProjects)
+				document.querySelector('.bucke').addEventListener("change", function(event) {
+					const ev_type = "projects"
+					updateDataPage(event, ev_type)
+				});
+				// document.querySelector('.bucke').addEventListener("change", updateDataPage)
+				// document.querySelector('.bucke').addEventListener("change", updateListProjects)
 			})
 		} else if (button_text === "Сравнение тестов") {
 			$( "#wrapper" ).load( "/compare_release", function() {
 				document.querySelector('.formWithValidation').addEventListener('submit', handleCompareRelease)
-				document.querySelector('.bucke').addEventListener("change", updateListProjects)
+				document.querySelector('.bucke').addEventListener("change", function(event) {
+					const ev_type = "projects"
+					updateDataPage(event, ev_type)
+				});
+				// document.querySelector('.bucke').addEventListener("change", updateListProjects)
 			})
 		}
 		///////////// Управление тестами /////////////
@@ -132,71 +152,36 @@ function toggleNavbarLeft(e) {
 	}
 }
 
-function updateListBuckets(event) {
+function updateDataPage(event, ev_type) {
 	console.log(`update!!`)
 	let xhr = new XMLHttpRequest();
 	let data = {};
-	let new_options = [];
-	data["project"] = document.querySelector('#project_options').value
-	data["StartTime"] = document.querySelector('.StartTime').value
-	data["EndTime"] = document.querySelector('.EndTime').value
-
-	console.log(`project: `, document.querySelector('#project_options').value)
-	xhr.open("POST", "/get_project_buckets", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.onreadystatechange = function() {
-		if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-			let response = JSON.parse(this.responseText);
-			console.log(response);
-			var select = $('#bucket_options')
-			select.empty();
-			for (var j = 0; j < response.length; j++){
-				console.log(response[j]);
-				select.append("<option value='" +response[j]+ "'>" +response[j]+ "     </option>");
-			}
-		}
+	let url
+	var select
+	if (ev_type === "bucket") {
+		data["project"] = document.querySelector('#project_options').value
+		data["StartTime"] = document.querySelector('.StartTime').value
+		data["EndTime"] = document.querySelector('.EndTime').value
+		console.log(`project: `, data["project"])
+		url = "/get_project_buckets"
+		select = $('#bucket_options')
+	} else if (ev_type === "versions") {
+		data["project"] = document.querySelector('#settings_activeproject').value
+		console.log(`project: `, data["project"])
+		url = "/get_version_list"
+		select = $('#settings_version_list')
+	} else if (ev_type === "projects") {
+		data["project"] = document.querySelector('#bucket_options').value
+		console.log(`project: `, data["project"])
+		url = "/get_bucket_projects"
+		select = $('#project_options')
 	}
-	xhr.send(JSON.stringify(data));
-}
-
-function  updateListVersions(event) {
-	console.log(`update versions!`)
-	let xhr = new XMLHttpRequest();
-	let data = {};
-	let new_versions = [];
-	data["project"] = document.querySelector('#settings_activeproject').value
-	xhr.open("POST", "/get_version_list", true);
+	xhr.open("POST", url, true);
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 	xhr.onreadystatechange = function() {
 		if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
 			let response = JSON.parse(this.responseText);
 			console.log(response);
-			var select = $('#settings_version_list')
-			select.empty();
-			for (var j = 0; j < response.length; j++){
-				console.log(response[j]);
-				select.append("<option value='" +response[j]+ "'>" +response[j]+ "     </option>");
-			}
-		}
-	}
-	xhr.send(JSON.stringify(data));
-}
-
-function updateListProjects(event) {
-	console.log(`update proj!`)
-	let xhr = new XMLHttpRequest();
-	let data = {};
-	let new_options = [];
-	data["project"] = document.querySelector('#bucket_options').value
-
-	console.log(`project: `, document.querySelector('#bucket_options').value)
-	xhr.open("POST", "/get_bucket_projects", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.onreadystatechange = function() {
-		if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-			let response = JSON.parse(this.responseText);
-			console.log(response);
-			var select = $('#project_options')
 			select.empty();
 			for (var j = 0; j < response.length; j++){
 				console.log(response[j]);
@@ -486,7 +471,9 @@ function toTimestamp(strDate){
 	return datum/1000;
 }
 
-$(document).ready(function($){
+$(document).on('DOMContentLoaded', function($){
+	// const mainNavLink = document.getElementById("mainNavLink");
+	// mainNavLink.classList.add("active");
 	setTimeout(function(){ test(); });
 });
 $(window).on('resize', function(){
@@ -508,16 +495,13 @@ $(window).on('DOMContentLoaded',function () {
 	}
 	console.log("path = " + path);
 
-	let target = $('#navbarSupportedContent ul li a[href="' + path + '"]');
+	let target = $('#mainNavLink');
+	// let target = $('#navbarSupportedContent ul li a[href="' + path + '"]');
 	// Add active class to target link
 	target.parent().addClass('active');
 
 	// Проверяем, был ли уже выполнен .load()
-	if (!$("#wrapper").data("loaded")) {
-		$("#wrapper").data("loaded", true);
 
-		$( "#wrapper" ).load( "/main_page" );
-	}
 });
 
 
