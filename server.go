@@ -113,7 +113,8 @@ func createBucket(c *fiber.Ctx) error {
 		"bucket": "my_bucket",
 	}
 	url := "/beeload/create/bucket"
-	sendPost(c, url, requestData)
+	res := sendPost(c, url, requestData)
+	fmt.Println(res)
 	return nil //TODO: Надо что то сделать с отрисовкой ответа
 }
 func addDataForBeeLoad(c *fiber.Ctx) error {
@@ -166,8 +167,6 @@ func getCurrentTests(c *fiber.Ctx) error {
 	logrus.Debug("getCurrentTests")
 	url := "/beeload/get/tabledatacurrenttests"
 	res := sendGet(c, url)
-	//fmt.Println(res)
-	// расшифровка ответа
 	dataStr := string(res)
 
 	// Разбиваем на строки
@@ -198,14 +197,17 @@ func getSettings(c *fiber.Ctx) error {
 	claims, ok := (value).(*jwt.MapClaims)
 	username, ok := (*claims)["username"].(string)
 	db := getDbConn()
-	activeProject, _ := GetUserProject(db, username)
-	projectsList, _ := GetUserProjects(db, username)
-	isAdmin, _ := hasUserRole(db, username, "admin")
+	activeProject, err := GetUserProject(db, username)
+	projectsList, err := GetUserProjects(db, username)
+	isAdmin, err := hasUserRole(db, username, "admin")
 	logrus.Debug("is_admin: ", isAdmin)
 	if !ok {
 		// Обработка ошибки преобразования
 		logrus.Error("getSettings: username conversion failed")
 		return fmt.Errorf("username conversion failed")
+	}
+	if err != nil {
+		logrus.Error(err)
 	}
 	additional := ""
 	if isAdmin {
@@ -256,6 +258,12 @@ func addVersion(c *fiber.Ctx) error {
 		logrus.Error(err)
 		return err
 	}
+	url := "/beeload/add/version"
+	requestData := map[string]interface{}{
+		"version": version.Value,
+	}
+	res := sendRequest(c, "Post", url, requestData)
+	fmt.Print(res)
 	return nil
 } //TODO: COMPLETE
 
@@ -270,15 +278,40 @@ func addMethodic(c *fiber.Ctx) error {
 
 func getReportHistory(c *fiber.Ctx) error {
 	logrus.Debug("getReportHistory")
+	value := c.Locals("user")
+	claims, ok := (value).(*jwt.MapClaims)
+	username, ok := (*claims)["username"].(string)
+	db := getDbConn()
+	activeProject, err := GetUserProject(db, username)
+	if !ok {
+		// Обработка ошибки преобразования
+		logrus.Error("getSettings: username conversion failed")
+		return fmt.Errorf("username conversion failed")
+	}
+	if err != nil {
+		logrus.Error(err)
+	}
 	return c.Render("report_history",
-		fiber.Map{"Table_reports": get_last_10_reports_table(GetTableDataReports(c, "Jmeter", 0))})
+		fiber.Map{"Table_reports": get_last_10_reports_table(GetTableDataReports(c, activeProject, 0))})
 }
 
 func getTestHistory(c *fiber.Ctx) error {
 	logrus.Debug("getTestHistory")
+	value := c.Locals("user")
+	claims, ok := (value).(*jwt.MapClaims)
+	username, ok := (*claims)["username"].(string)
+	db := getDbConn()
+	activeProject, err := GetUserProject(db, username)
+	if !ok {
+		// Обработка ошибки преобразования
+		logrus.Error("getSettings: username conversion failed")
+		return fmt.Errorf("username conversion failed")
+	}
+	if err != nil {
+		logrus.Error(err)
+	}
 	return c.Render("test_history",
-		fiber.Map{"Table_reports": get_last_10_reports_table(GetTableDataReports(c, "Jmeter", 0))})
-	//TODO: сделать привязку проекта
+		fiber.Map{"Table_reports": get_last_10_reports_table(GetTableDataReports(c, activeProject, 0))})
 }
 
 func getStartTest(c *fiber.Ctx) error {

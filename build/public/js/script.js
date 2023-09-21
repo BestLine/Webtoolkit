@@ -131,6 +131,7 @@ function toggleNavbarLeft(e) {
 		if (!navbarLeft.classList.contains('show')) {
 			navbarLeft.classList.add('show'); // Добавляем класс 'show' для показа блока с анимацией
 		}
+		console.log("TEST");
 		NavbarLeftHandler();
 	} else {
 		navbarLeft.classList.remove('show');

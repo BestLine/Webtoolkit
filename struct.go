@@ -12,7 +12,7 @@ type Project struct {
 }
 
 type Version struct {
-	Name string `json:"version"`
+	Value string `json:"version"`
 }
 
 type MethodicSet struct {
