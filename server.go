@@ -115,12 +115,13 @@ func createBucket(c *fiber.Ctx) error {
 	url := "/beeload/create/bucket"
 	res := sendPost(c, url, requestData)
 	fmt.Println(res)
-	return nil //TODO: Надо что то сделать с отрисовкой ответа
+	return nil //TODO: Надо что то сделать с отрисовкой ответа и добавить правильные данные
 }
 func addDataForBeeLoad(c *fiber.Ctx) error {
 	logrus.Debug("postAddHomePageForBeeLoad!")
 	//var req addconfluence
-	//c.Body()
+	body := c.Body()
+	fmt.Println(body)
 	//json.Unmarshal(c.Body(), &req)
 	//pgAddInfo(req.Bucket, req.ID)
 	return nil //TODO: реалиация

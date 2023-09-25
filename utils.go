@@ -199,7 +199,7 @@ func get_project_list(c *fiber.Ctx) []string {
 	var data []map[string]string
 	err := json.Unmarshal([]byte(res), &data)
 	if err != nil {
-		fmt.Println("Error:", err)
+		logrus.Error(err)
 		return nil
 	}
 	return dataToListOfStrings(data, "Project")
