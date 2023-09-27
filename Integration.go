@@ -46,6 +46,7 @@ func sendGet(c *fiber.Ctx, url string) []byte {
 	targetURL := viper.GetString("backend.host") + url
 	response, err := http.Get(targetURL)
 	if err != nil {
+		logrus.Error(err)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
 		return nil
 	}
@@ -54,6 +55,7 @@ func sendGet(c *fiber.Ctx, url string) []byte {
 	// Читаем ответ
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		logrus.Error(err)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
 		return nil
 	}
@@ -64,6 +66,9 @@ func sendGet(c *fiber.Ctx, url string) []byte {
 }
 
 func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
+	// 1st Get\Post
+	// 2st url
+	// 3rd body
 	logrus.Debug("sendRequest")
 	var strArgs []string
 	var response *http.Response
@@ -86,23 +91,38 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 		logrus.Debug("body: ", body)
 		jsonBody, err := json.Marshal(body)
 		if err != nil {
+			logrus.Error(err)
 			c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
-			return nil
+			return []byte("{\"count\":10,\"data\":" +
+				"[{\"application\":\"Сервера на данный момент не доступны! \",\"bucket\":\"-\",\"cfurl\":\"-\"}]}")
 		}
 		response, err = http.Post(targetURL, "application/json", bytes.NewBuffer(jsonBody))
 	}
 	if err != nil {
+		logrus.Error(err)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
-		return nil
+		return []byte("{\"count\":10,\"data\":" +
+			"[{\"application\":\"Сервера на данный момент не доступны! \",\"bucket\":\"-\",\"cfurl\":\"-\"}]}")
 	}
 	defer response.Body.Close()
-	responseBody, err := ioutil.ReadAll(response.Body)
+	//responseBody, err := ioutil(response.Body)
+	//responseBody := bytes.NewBuffer(make([]byte, response.ContentLength))
+
 	if err != nil {
+		logrus.Error(err)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
-		return nil
+		return []byte("{\"count\":10,\"data\":" +
+			"[{\"application\":\"Сервера на данный момент не доступны! \",\"bucket\":\"-\",\"cfurl\":\"-\"}]}")
 	}
 	logrus.Debug("targetURL: ", targetURL)
 	logrus.Debug("response: ", response)
-	fmt.Println("Response =", string(responseBody))
-	return responseBody
+	//fmt.Println("Response =", string(responseBody))
+	fmt.Println("resp code: ", response.StatusCode)
+	if response.StatusCode != 200 {
+		logrus.Error("sendRequest responce code: ", response.StatusCode)
+		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+		return []byte("{\"count\":10,\"data\":" +
+			"[{\"application\":\"Сервера на данный момент не доступны! \",\"bucket\":\"-\",\"cfurl\":\"-\"}]}")
+	}
+	return RespToByteReader(response)
 }

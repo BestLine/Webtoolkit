@@ -167,7 +167,8 @@ func getMainPage(c *fiber.Ctx) error {
 func getCurrentTests(c *fiber.Ctx) error {
 	logrus.Debug("getCurrentTests")
 	url := "/beeload/get/tabledatacurrenttests"
-	res := sendGet(c, url)
+	//res := sendGet(c, url)
+	res := sendRequest(c, "Get", url)
 	dataStr := string(res)
 
 	// Разбиваем на строки

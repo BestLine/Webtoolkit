@@ -226,7 +226,7 @@ function handleVersionAdd(event) {
 	event.preventDefault()
 	data["version"] = version.value
 	console.log("JSON: ", JSON.stringify(data))
-	xhr.open("POST", "beeload/add/version", true);
+	xhr.open("POST", "/beeload/add/version", true);
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 	xhr.send(JSON.stringify(data));
 	let msg = form.querySelector('.msg')
@@ -325,6 +325,7 @@ function setActiveProject(event) {
 		}
 	})
 		.catch(error => {
+			responceMsg.textContent = "[ERROR] Код ответа сервера: " + this.status + this.responseText;
 			// Обработка ошибок сети или других проблем
 		});
 
