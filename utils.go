@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"io"
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -19,7 +21,8 @@ func GetTableDataReports(c *fiber.Ctx, project string, count int) JSONData {
 		url = "/beeload/get/tableDataReports?&count=10"
 	}
 	logrus.Debug("url: ", url)
-	res := sendGet(c, url)
+	//res := sendGet(c, url)
+	res := sendRequest(c, "Get", url)
 	json.Unmarshal(res, &data)
 	return data
 }
@@ -27,7 +30,8 @@ func GetTableDataReports(c *fiber.Ctx, project string, count int) JSONData {
 func GetTableDataTests(c *fiber.Ctx) [][]string {
 	logrus.Debug("GetTableDataTests")
 	url := "/beeload/get/tableDataTests"
-	res := sendGet(c, url)
+	//res := sendGet(c, url)
+	res := sendRequest(c, "Get", url)
 	dataStr := string(res)
 	rows := strings.Split(dataStr, "},{")
 
@@ -119,7 +123,8 @@ func get_status_table(data [][]string) string {
 func GetTableDataStatus(c *fiber.Ctx) [][]string {
 	logrus.Debug("GetTableDataStatus")
 	url := "/beeload/get/tableDataStatus"
-	res := sendGet(c, url)
+	//res := sendGet(c, url)
+	res := sendRequest(c, "Get", url)
 	//fmt.Println(res)
 	// расшифровка ответа
 	dataStr := string(res)
@@ -183,7 +188,8 @@ func make_settings_projects_list(active string, projects []string) string {
 
 func get_bucket_list(c *fiber.Ctx) []string {
 	url := "/beeload/get/bucketList"
-	res := sendGet(c, url)
+	//res := sendGet(c, url)
+	res := sendRequest(c, "Get", url)
 	var data []map[string]string
 	err := json.Unmarshal([]byte(res), &data)
 	if err != nil {
@@ -195,7 +201,8 @@ func get_bucket_list(c *fiber.Ctx) []string {
 
 func get_project_list(c *fiber.Ctx) []string {
 	url := "/beeload/get/projectList"
-	res := sendGet(c, url)
+	//res := sendGet(c, url)
+	res := sendRequest(c, "Get", url)
 	var data []map[string]string
 	err := json.Unmarshal([]byte(res), &data)
 	if err != nil {
@@ -208,7 +215,8 @@ func get_project_list(c *fiber.Ctx) []string {
 func get_versions_list(c *fiber.Ctx, project string) []string {
 	fmt.Println(`Project: `, project)
 	url := "/beeload/get/versionList?project=" + project
-	res := sendGet(c, url)
+	//res := sendGet(c, url)
+	res := sendRequest(c, "Get", url)
 	var data []map[string]string
 	err := json.Unmarshal([]byte(res), &data)
 	if err != nil {
@@ -221,7 +229,8 @@ func get_versions_list(c *fiber.Ctx, project string) []string {
 func get_project_buckets(c *fiber.Ctx, project string) []string {
 	logrus.Debug("get_project_buckets Project: ", project)
 	url := "/beeload/get/bucketList?project=" + project
-	res := sendGet(c, url)
+	//res := sendGet(c, url)
+	res := sendRequest(c, "Get", url)
 	logrus.Debug("URL: ", url)
 	var data []map[string]string
 	err := json.Unmarshal([]byte(res), &data)
@@ -235,7 +244,8 @@ func get_project_buckets(c *fiber.Ctx, project string) []string {
 func get_bucket_projects(c *fiber.Ctx, bucket string) []string {
 	logrus.Debug("get_bucket_projects Bucket: ", bucket)
 	url := "/beeload/get/bucketList?bucket=" + bucket
-	res := sendGet(c, url)
+	//res := sendGet(c, url)
+	res := sendRequest(c, "Get", url)
 	logrus.Debug("URL: ", url)
 	var data []map[string]string
 	err := json.Unmarshal([]byte(res), &data)
@@ -263,4 +273,23 @@ func add_tags(imp_list []string) string {
 		s += d
 	}
 	return s
+}
+
+func RespToByteReader(response *http.Response) []byte {
+	var buf []byte
+	const chunkSize = 1024 // Размер чанка для чтения данных
+
+	for {
+		chunk := make([]byte, chunkSize)
+		n, err := response.Body.Read(chunk)
+		if err != nil && err != io.EOF {
+			logrus.Error(err)
+			return nil
+		}
+		if n == 0 {
+			break
+		}
+		buf = append(buf, chunk[:n]...)
+	}
+	return buf
 }

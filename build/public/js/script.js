@@ -9,11 +9,24 @@ function test(){
 			toggleNavbarLeft(e)
 		}
 		if (e.target.textContent==="Главная"){
-			$( "#wrapper" ).load( "/main_page" );
+			$( "#wrapper" ).load( "/main_page", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}
+			});
 		} else if (e.target.textContent === "Управление отчётами") {
 			buttons.forEach(btn => btn.classList.remove('active'));
 			e.target.classList.add('active');
-			$( "#wrapper" ).load( "/make_report", function() {
+			$( "#wrapper" ).load( "/make_report", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+					}
 				document.querySelector('.formWithValidation').addEventListener('submit', handleMakeReport)
 				document.querySelector('.EndTime').addEventListener('change', checkTime)
 				document.querySelector('.StartTime').addEventListener('change', checkTime)
@@ -23,11 +36,23 @@ function test(){
 				});
 			})
 		} else if (e.target.textContent === "Управление тестами") {
-			$( "#wrapper" ).load( "/current_tests", function () {
+			$( "#wrapper" ).load( "/current_tests", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}
 				// document.querySelector('.formWithValidation').addEventListener('submit', handleCreateBucket)
 			});
 		} else if (e.target.textContent === "Настройки проектов") {
-			$("#wrapper").load("/settings", function () {
+			$("#wrapper").load("/settings", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}
 				updateDataPage(event, "versions")
 				document.getElementById("btn_set_project").addEventListener('click', setActiveProject)
 				document.getElementById("btn_set_methodic").addEventListener('click', handleMetodicSet)
@@ -65,9 +90,21 @@ function NavbarLeftHandler() {
 		e.target.classList.add('active');
 		///////////// Управление отчётами /////////////
 		if (button_text === "История отчётов") {
-			$( "#wrapper" ).load( "/report_history")
+			$( "#wrapper" ).load( "/report_history", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}})
 		} else if (button_text === "Создать отчёт") {
-			$( "#wrapper" ).load( "/make_report", function() {
+			$( "#wrapper" ).load( "/make_report", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}
 				document.querySelector('.formWithValidation').addEventListener('submit', handleMakeReport)
 				document.querySelector('.proj').addEventListener("change", function(event) {
 					const ev_type = "bucket"
@@ -75,15 +112,33 @@ function NavbarLeftHandler() {
 				});
 			})
 		} else if (button_text === "Создать бакет") {
-			$( "#wrapper" ).load( "/create_bucket", function () {
+			$( "#wrapper" ).load( "/create_bucket", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}
 				document.querySelector('.formWithValidation').addEventListener('submit', handleCreateBucket)
 			});
 		} else if (button_text === "Привязка корневой страницы конфлюенс") {
-			$( "#wrapper" ).load( "/set_report_homepage", function () {
+			$( "#wrapper" ).load( "/set_report_homepage", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}
 				document.querySelector('.formWithValidation').addEventListener('submit', handleSetReportHomepage)
 			});
 		} else if (button_text === "Привязать методику") {
-			$( "#wrapper" ).load( "/set_methodic", function() {
+			$( "#wrapper" ).load( "/set_methodic", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}
 				document.querySelector('.formWithValidation').addEventListener('submit', handleMetodicSet)
 				document.querySelector('.bucke').addEventListener("change", function(event) {
 					const ev_type = "projects"
@@ -91,7 +146,13 @@ function NavbarLeftHandler() {
 				});
 			})
 		} else if (button_text === "Сравнение тестов") {
-			$( "#wrapper" ).load( "/compare_release", function() {
+			$( "#wrapper" ).load( "/compare_release", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}
 				document.querySelector('.formWithValidation').addEventListener('submit', handleCompareRelease)
 				document.querySelector('.bucke').addEventListener("change", function(event) {
 					const ev_type = "projects"
@@ -101,11 +162,29 @@ function NavbarLeftHandler() {
 		}
 		///////////// Управление тестами /////////////
 		else if (button_text === "История тестов") {
-			$( "#wrapper" ).load( "/test_history")
+			$( "#wrapper" ).load( "/test_history", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}})
 		} else if (button_text === "Текущие тесты") {
-			$( "#wrapper" ).load( "/current_tests")
+			$( "#wrapper" ).load( "/current_tests", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}})
 		} else if (button_text === "Запустить тест") {
-			$( "#wrapper" ).load( "/start_test")
+			$( "#wrapper" ).load( "/start_test", function(responseText, textStatus) {
+				if (textStatus === "error") {
+					// В случае ошибки загрузки, выводим сообщение
+					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+						"color: red; " +
+						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+				}})
 		}
 	});
 }
@@ -472,7 +551,14 @@ function toTimestamp(strDate){
 }
 
 $(document).ready(function(){
-	$( "#wrapper" ).load( "/main_page" );
+	$("#wrapper").load("/main_page", function(responseText, textStatus, jqXHR) {
+		if (textStatus === "error") {
+			// В случае ошибки загрузки, выводим сообщение
+			$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+				"color: red; " +
+				"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+		}
+	});
 	setTimeout(function() {anim(); }, 200);
 	setTimeout(function(){ test(); }, 100);
 	$(window).on('resize', function() {
