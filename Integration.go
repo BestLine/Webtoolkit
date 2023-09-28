@@ -93,16 +93,14 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 		if err != nil {
 			logrus.Error(err)
 			c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
-			return []byte("{\"count\":10,\"data\":" +
-				"[{\"application\":\"Сервера на данный момент не доступны! \",\"bucket\":\"-\",\"cfurl\":\"-\"}]}")
+			return nil
 		}
 		response, err = http.Post(targetURL, "application/json", bytes.NewBuffer(jsonBody))
 	}
 	if err != nil {
 		logrus.Error(err)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
-		return []byte("{\"count\":10,\"data\":" +
-			"[{\"application\":\"Сервера на данный момент не доступны! \",\"bucket\":\"-\",\"cfurl\":\"-\"}]}")
+		return nil
 	}
 	defer response.Body.Close()
 	//responseBody, err := ioutil(response.Body)
@@ -111,8 +109,7 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 	if err != nil {
 		logrus.Error(err)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
-		return []byte("{\"count\":10,\"data\":" +
-			"[{\"application\":\"Сервера на данный момент не доступны! \",\"bucket\":\"-\",\"cfurl\":\"-\"}]}")
+		return nil
 	}
 	logrus.Debug("targetURL: ", targetURL)
 	logrus.Debug("response: ", response)
@@ -121,8 +118,7 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 	if response.StatusCode != 200 {
 		logrus.Error("sendRequest responce code: ", response.StatusCode)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
-		return []byte("{\"count\":10,\"data\":" +
-			"[{\"application\":\"Сервера на данный момент не доступны! \",\"bucket\":\"-\",\"cfurl\":\"-\"}]}")
+		return nil
 	}
 	return RespToByteReader(response)
 }
