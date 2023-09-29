@@ -113,7 +113,8 @@ func createBucket(c *fiber.Ctx) error {
 		"bucket": "my_bucket",
 	}
 	url := "/beeload/create/bucket"
-	res := sendPost(c, url, requestData)
+	//res := sendPost(c, url, requestData)
+	res := sendRequest(c, "Post", url, requestData)
 	fmt.Println(res)
 	return nil //TODO: Надо что то сделать с отрисовкой ответа и добавить правильные данные
 }
@@ -145,7 +146,8 @@ func compareRelease(c *fiber.Ctx) error {
 		"bucket":       "my_bucket",
 	}
 	url := "/beeload/compare/release"
-	sendPost(c, url, requestData)
+	//sendPost(c, url, requestData)
+	sendRequest(c, "Post", url, requestData)
 	return nil
 }
 
