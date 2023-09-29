@@ -56,8 +56,7 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 	}
 	logrus.Debug("targetURL: ", targetURL)
 	logrus.Debug("response: ", response)
-	//fmt.Println("Response =", string(responseBody))
-	fmt.Println("resp code: ", response.StatusCode)
+	//fmt.Println("resp code: ", response.StatusCode)
 	if response.StatusCode != 200 {
 		logrus.Error("sendRequest responce code: ", response.StatusCode)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")

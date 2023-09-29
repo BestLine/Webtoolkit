@@ -53,6 +53,7 @@ body {
 .navbar-left.show {
     padding: 10px;
     width: 200px; /* Показываем блок, устанавливая ширину */
+    /*.form_wrapper.` здесь надо добавить уменьшение ширины основного экрана с учётом навбара*/
 }
 
 .navbar-left button {

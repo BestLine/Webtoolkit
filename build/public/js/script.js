@@ -1,7 +1,7 @@
 // ---------Responsive-navbar-active-animation-----------
 function test(){
 	const buttons = document.querySelectorAll('.l_btn');
-	$("#navbarSupportedContent").on("click","li",function(e){
+	$("#navbarSupportedContent").off("click").on("click","li",function(e){
 		if (e.target.textContent!=="Выход") {
 			$('#navbarSupportedContent ul li').removeClass("active");
 			$(this).addClass('active');
@@ -54,9 +54,11 @@ function test(){
 						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
 				}
 				updateDataPage(event, "versions")
+				updateDataPage(event, "hosts")
 				document.getElementById("btn_set_project").addEventListener('click', setActiveProject)
 				document.getElementById("btn_set_methodic").addEventListener('click', handleMetodicSet)
 				document.getElementById("btn_set_version").addEventListener('click', handleVersionAdd)
+				document.getElementById("btn_create_new_bucket").addEventListener('click', handleCreateBucket)
 				// document.getElementById("settings_version_list").addEventListener('change', updateListVersions)
 
 			});
@@ -83,7 +85,7 @@ function anim(e) {
 
 function NavbarLeftHandler() {
 	const buttons = document.querySelectorAll('.l_btn');
-	$('#navbarLeft').on("click",function(e) {
+	$('#navbarLeft').off("click").on("click",function(e) {
 		let button_text = e.target.textContent
 		console.log(button_text);
 		buttons.forEach(btn => btn.classList.remove('active'));
@@ -240,6 +242,9 @@ function updateDataPage(event, ev_type) {
 		console.log(`project: `, data["project"])
 		url = "/get_bucket_projects"
 		select = $('#project_options')
+	} else if (ev_type === "hosts") {
+		url = "/get_host_list"
+		select = $('#settings_host')
 	}
 	xhr.open("POST", url, true);
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
@@ -412,9 +417,9 @@ function setActiveProject(event) {
 
 function handleCreateBucket(event) {
 	event.preventDefault();
-	let form = document.querySelector('.formWithValidation');
-	let host = form.querySelector('.project');
-	let bucket = form.querySelector('.bucket');
+	// TODO: переделать реализацию под новое меню настроек
+	let host =document.querySelector('#settings_host')
+	let bucket = document.querySelector('#new_bucket_name');
 	let data = {
 		host: host.value,
 		bucket: bucket.value

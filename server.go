@@ -28,11 +28,12 @@ func setupUnprotectedRoutes(app *fiber.App) {
 func setupProtectedRoutes(app *fiber.App) {
 	app.Post("/beeload/add/home", addDataForBeeLoad)
 	app.Post("/beeload/compare/data", compareData)
-	app.Post("/beeload/create/bucket", checkUserPermission, createBucket)
+	//app.Post("/beeload/create/bucket", checkUserPermission, createBucket)
+	app.Post("/beeload/create/bucket", createBucket)
 	app.Post("/beeload/compare/release", compareRelease)
 	app.Post("/beeload/set/project", setActiveUserProject)
 	app.Post("/beeload/add/methodic", addMethodic) // TODO: добавить обработку методики
-	app.Post("beeload/add/version", addVersion)    // TODO: добавить обработку дополнения версии
+	app.Post("/beeload/add/version", addVersion)   // TODO: добавить обработку дополнения версии
 	app.Get("/", startPage)
 	app.Get("/main_page", getMainPage)
 	app.Get("/compare", getCompare)
@@ -49,6 +50,7 @@ func setupProtectedRoutes(app *fiber.App) {
 	app.Post("/get_bucket_projects", GetBucketProjects)
 	app.Get("/compare_release", getCompareRelease)
 	app.Post("/get_version_list", GetVersionsList)
+	app.Post("/get_host_list", GetHostList)
 }
 
 func main() {
@@ -115,7 +117,7 @@ func createBucket(c *fiber.Ctx) error {
 	url := "/beeload/create/bucket"
 	//res := sendPost(c, url, requestData)
 	res := sendRequest(c, "Post", url, requestData)
-	fmt.Println(res)
+	c.SendString(string(res))
 	return nil //TODO: Надо что то сделать с отрисовкой ответа и добавить правильные данные
 }
 func addDataForBeeLoad(c *fiber.Ctx) error {
@@ -222,6 +224,7 @@ func getSettings(c *fiber.Ctx) error {
 				"User":          "Текущий пользователь: " + username,
 				"Additional":    additional,
 				"Versions":      "<option selected>Выберите версию</option>",
+				"HostList":      "<option selected>Выберите хост</option>",
 				"ActiveProject": make_settings_projects_list(activeProject, projectsList)})
 	} else {
 		additional = ""
@@ -230,6 +233,7 @@ func getSettings(c *fiber.Ctx) error {
 				"User":          "Текущий пользователь: " + username,
 				"Additional":    additional,
 				"Versions":      "<option selected>Выберите версию</option>",
+				"HostList":      "<option selected>Выберите хост</option>",
 				"ActiveProject": make_settings_projects_list(activeProject, projectsList)})
 	}
 }
@@ -248,12 +252,12 @@ func setActiveUserProject(c *fiber.Ctx) error {
 	logrus.Debug("Project = ", bucket.Name)
 	err := SetActiveProject(db, username, bucket.Name)
 	if err != nil {
-		logrus.Error("setActiveUserProject: ", err)
+		logrus.Error("setActiveUserProject ERROR: ", err)
 	}
 	activeProject, _ := GetUserProject(db, username)
-	projectsList, _ := GetUserProjects(db, username)
-	return c.Render("settings",
-		fiber.Map{"ActiveProject": make_settings_projects_list(activeProject, projectsList)})
+	logrus.Debug("setActiveUserProject ACTIVE: ", activeProject)
+	//projectsList, _ := GetUserProjects(db, username)
+	return c.SendString("OK")
 }
 
 func addVersion(c *fiber.Ctx) error {
@@ -267,9 +271,9 @@ func addVersion(c *fiber.Ctx) error {
 		"version": version.Value,
 	}
 	res := sendRequest(c, "Post", url, requestData)
-	fmt.Print(res)
-	return nil
-} //TODO: COMPLETE
+	//fmt.Print(string(res))
+	return c.SendString(string(res))
+}
 
 func addMethodic(c *fiber.Ctx) error {
 	methodic := new(MethodicSet)
@@ -277,7 +281,14 @@ func addMethodic(c *fiber.Ctx) error {
 		logrus.Error(err)
 		return err
 	}
-	return nil
+	url := "/beeload/add/methodic"
+	requestData := map[string]interface{}{
+		"bucket":  methodic.Bucket,
+		"version": methodic.Version,
+		"page":    methodic.Page,
+	}
+	res := sendRequest(c, "Post", url, requestData)
+	return c.SendString(string(res))
 } //TODO: COMPLETE
 
 func getReportHistory(c *fiber.Ctx) error {
@@ -365,6 +376,15 @@ func GetVersionsList(c *fiber.Ctx) error {
 		return err
 	}
 	return c.JSON(get_versions_list(c, project.Name))
+}
+
+func GetHostList(c *fiber.Ctx) error {
+	logrus.Debug("GetHostList")
+	project := new(Project)
+	if err := c.BodyParser(project); err != nil {
+		return err
+	}
+	return c.JSON(get_host_list(c, project.Name))
 }
 
 func GetProjectBuckets(c *fiber.Ctx) error {

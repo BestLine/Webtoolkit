@@ -21,6 +21,9 @@
         <div class="option">
             <p class="area_label">Создание нового бакета</p>
             <input type="text" id="new_bucket_name" placeholder="Введите имя нового бакета">
+            <select class='host field' id="settings_host">
+                {{ unescape .HostList}}
+            </select>
             <button class="l_btn" id="btn_create_new_bucket" formaction="submit">Создать бакет</button>
         </div>
         <div class="option">

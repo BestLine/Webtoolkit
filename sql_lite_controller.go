@@ -241,7 +241,7 @@ func SetActiveProject(db *sql.DB, username string, projectToActivate string) err
 	updateQuery := "UPDATE user_projects " +
 		"SET active = 0 " +
 		"WHERE user_id = (SELECT id FROM users WHERE username = ?)"
-	logrus.Debug("QW_1 = ", updateQuery, username)
+	logrus.Debug("QW_1 = ", updateQuery, " username=", username)
 	_, err := db.Exec(updateQuery, username)
 	if err != nil {
 		return err
@@ -252,7 +252,7 @@ func SetActiveProject(db *sql.DB, username string, projectToActivate string) err
 		"SET active = 1 " +
 		"WHERE user_id = (SELECT id FROM users WHERE username = ?) " +
 		"AND project_id = (SELECT id FROM projects WHERE project_name = ?)"
-	logrus.Debug("QW_2 = ", updateProjectQuery, username, projectToActivate)
+	logrus.Debug("QW_2 = ", updateProjectQuery, " username=", username, " projectToActivate=", projectToActivate)
 	_, err = db.Exec(updateProjectQuery, username, projectToActivate)
 	if err != nil {
 		return err

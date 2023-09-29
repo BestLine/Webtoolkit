@@ -226,6 +226,19 @@ func get_versions_list(c *fiber.Ctx, project string) []string {
 	return dataToListOfStrings(data, "Version")
 }
 
+func get_host_list(c *fiber.Ctx, project string) []string {
+	fmt.Println(`Project: `, project)
+	url := "/beeload/get/hostList?project=" + project
+	res := sendRequest(c, "Get", url)
+	var data []map[string]string
+	err := json.Unmarshal([]byte(res), &data)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return nil
+	}
+	return dataToListOfStrings(data, "Host")
+}
+
 func get_project_buckets(c *fiber.Ctx, project string) []string {
 	logrus.Debug("get_project_buckets Project: ", project)
 	url := "/beeload/get/bucketList?project=" + project
