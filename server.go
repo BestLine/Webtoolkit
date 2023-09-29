@@ -253,8 +253,13 @@ func setActiveUserProject(c *fiber.Ctx) error {
 	err := SetActiveProject(db, username, bucket.Name)
 	if err != nil {
 		logrus.Error("setActiveUserProject ERROR: ", err)
+		return err
 	}
-	activeProject, _ := GetUserProject(db, username)
+	activeProject, err := GetUserProject(db, username)
+	if err != nil {
+		logrus.Error("GetUserProject ERROR: ", err)
+		return err
+	}
 	logrus.Debug("setActiveUserProject ACTIVE: ", activeProject)
 	//projectsList, _ := GetUserProjects(db, username)
 	return c.SendString("OK")
