@@ -163,8 +163,8 @@ func getMainPage(c *fiber.Ctx) error {
 	logrus.Debug("getMainPage")
 	return c.Render("index",
 		fiber.Map{"Table_reports": get_last_10_reports_table(GetTableDataReports(c, "", 10)),
-			"Table_tests":  get_current_tests(GetTableDataTests(c)),
-			"Table_status": get_status_table(GetTableDataStatus(c)),
+			"Table_tests":  "get_current_tests(GetTableDataTests(c))",
+			"Table_status": "get_status_table(GetTableDataStatus(c))",
 		})
 }
 

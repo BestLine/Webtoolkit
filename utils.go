@@ -11,10 +11,10 @@ import (
 	"strings"
 )
 
-func GetTableDataReports(c *fiber.Ctx, project string, count int) JSONData {
+func GetTableDataReports(c *fiber.Ctx, project string, count int) TestsTableData {
 	logrus.Debug("getCurrentTests")
 	var url string
-	var data JSONData
+	var data TestsTableData
 	if project != "" {
 		url = "/beeload/get/tableDataReports?bucket=" + project + "&count=" + strconv.Itoa(count)
 	} else {
@@ -27,32 +27,21 @@ func GetTableDataReports(c *fiber.Ctx, project string, count int) JSONData {
 	return data
 }
 
-func GetTableDataTests(c *fiber.Ctx) [][]string {
+func GetTableDataTests(c *fiber.Ctx) CurrentTestsTableData {
 	logrus.Debug("GetTableDataTests")
 	url := "/beeload/get/tableDataTests"
 	//res := sendGet(c, url)
+	var data CurrentTestsTableData
+	logrus.Debug("url: ", url)
 	res := sendRequest(c, "Get", url)
-	dataStr := string(res)
-	rows := strings.Split(dataStr, "},{")
-
-	// Подготовка для парсинга
-	var data [][]string
-	for _, row := range rows {
-		// Удаление лишних символов
-		row = strings.Trim(row, "[{]}")
-		// Разбиваем на элементы
-		items := strings.Split(row, ",")
-		var itemStrings []string
-		for _, item := range items {
-			item = strings.Trim(item, "\" ")
-			itemStrings = append(itemStrings, item)
-		}
-		data = append(data, itemStrings)
+	err := json.Unmarshal(res, &data)
+	if err != nil {
+		return CurrentTestsTableData{}
 	}
 	return data
 }
 
-func get_last_10_reports_table(data JSONData) string {
+func get_last_10_reports_table(data TestsTableData) string {
 	table := "<table>\n"
 	table += "<thead>\n"
 	table += "<tr>\n"
@@ -74,7 +63,7 @@ func get_last_10_reports_table(data JSONData) string {
 	return table
 }
 
-func get_current_tests(data [][]string) string {
+func get_current_tests(data CurrentTestsTableData) string {
 	table := "<table>\n"
 	table += "<thead>\n"
 	table += "<tr>\n"
@@ -86,15 +75,18 @@ func get_current_tests(data [][]string) string {
 	table += "</tr>\n"
 	table += "</thead>\n"
 	table += "<tbody>\n"
-	for _, row := range data {
+	for _, row := range data.Data {
 		table += "<tr>\n"
-		for _, col := range row {
-			table += "<td>" + col + "</td>\n"
-		}
+		table += "<td>" + row.Project + "</td>\n"
+		table += "<td>" + row.Bucket + "</td>\n"
+		table += "<td>" + row.StartTime + "</td>\n"
+		table += "<td>" + row.Status + "</td>\n"
+		table += "<td>" + row.Type + "</td>\n"
 		table += "</tr>\n"
 	}
 	table += "</tbody>\n"
 	table += "</table>\n"
+	fmt.Println("awd: ", table)
 	return table
 }
 
