@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -192,6 +193,11 @@ func get_bucket_list(c *fiber.Ctx) []string {
 }
 
 func get_project_list(c *fiber.Ctx) []string {
+	value := c.Locals("user")
+	claims, _ := (value).(*jwt.MapClaims)
+	username, _ := (*claims)["username"].(string)
+	db := getDbConn()
+	activeProject, err := GetUserActiveProject(db, username)
 	url := "/beeload/get/projectList"
 	//res := sendGet(c, url)
 	res := sendRequest(c, "Get", url)

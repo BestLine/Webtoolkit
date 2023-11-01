@@ -8,7 +8,16 @@ type Role struct {
 }
 
 type Project struct {
-	Name string `json:"project"`
+	Name string `json:"project_name"`
+}
+
+type NewBucket struct {
+	Host   string `json:"host"`
+	Bucket string `json:"bucket"`
+}
+
+type NewRootPage struct {
+	Page string `json:"page"`
 }
 
 type Version struct {

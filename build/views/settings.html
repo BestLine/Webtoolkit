@@ -1,6 +1,5 @@
 <link rel="stylesheet" href="/css/settings.css">
 <div class="settings_page">
-
     <div class="settings_project">
         <p class="area_label">{{ unescape .User}}</p>
         <div class="option">
@@ -15,7 +14,7 @@
     <div class="settings_project right">
         <div class="option">
             <p class="area_label">Привязка корневой страницы конфлюенс</p>
-            <input type="text" id="confl_page_url" placeholder="Введите адрес страницы">
+            <input type="number" id="confl_page_url" placeholder="Введите адрес страницы">
             <button class="l_btn" id="btn_set_confl_page" formaction="submit">Привязать страницу</button>
         </div>
         <div class="option">
@@ -28,7 +27,7 @@
         </div>
         <div class="option">
             <p class="area_label">Привязка методики</p>
-            <input class='page' type="text" id="set_methodic_page" placeholder="Введите адрес страницы">
+            <input class="page" type="number" id="set_methodic_page" placeholder="Введите адрес страницы">
             <select class='version field' id="settings_version_list">
                 {{ unescape .Versions}}
             </select>

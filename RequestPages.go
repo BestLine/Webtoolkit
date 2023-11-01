@@ -114,7 +114,7 @@ func getSettings(c *fiber.Ctx) error {
 	claims, ok := (value).(*jwt.MapClaims)
 	username, ok := (*claims)["username"].(string)
 	db := getDbConn()
-	activeProject, err := GetUserProject(db, username)
+	activeProject, err := GetUserActiveProject(db, username)
 	projectsList, err := GetUserProjects(db, username)
 	isAdmin, err := hasUserRole(db, username, "admin")
 	logrus.Debug("is_admin: ", isAdmin)
@@ -129,6 +129,7 @@ func getSettings(c *fiber.Ctx) error {
 	additional := ""
 	if isAdmin {
 		projectsList, _ = GetAllProjects(db)
+		activeProject = "Выберите проект"
 		additional = "        <button class=\"l_btn\">Добавить сценарий</button>\n        <a class=\"l_btn\" href=\"/adminPanel\">Администрирование</a>"
 		return c.Render("settings",
 			fiber.Map{

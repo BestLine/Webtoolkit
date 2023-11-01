@@ -55,10 +55,12 @@ function test(){
 				}
 				updateDataPage(event, "versions")
 				updateDataPage(event, "hosts")
-				document.getElementById("btn_set_project").addEventListener('click', setActiveProject)
-				document.getElementById("btn_set_methodic").addEventListener('click', handleMetodicSet)
-				document.getElementById("btn_set_version").addEventListener('click', handleVersionAdd)
-				document.getElementById("btn_create_new_bucket").addEventListener('click', handleCreateBucket)
+				document.getElementById("btn_set_project").addEventListener('click', setActiveProject) // rabotaet
+				document.getElementById("btn_set_methodic").addEventListener('click', handleMetodicSet) // rabotaet
+				document.getElementById("btn_set_version").addEventListener('click', handleVersionAdd) // rabotaet
+				document.getElementById("btn_create_new_bucket").addEventListener('click', handleCreateBucket) // rabotaet
+				document.getElementById("btn_set_confl_page").addEventListener('click', handleConflPageAdd)
+
 				// document.getElementById("settings_version_list").addEventListener('change', updateListVersions)
 
 			});
@@ -220,12 +222,13 @@ function toggleNavbarLeft(e) {
 }
 
 function updateDataPage(event, ev_type) {
-	console.log(`update!!`)
+
 	let xhr = new XMLHttpRequest();
 	let data = {};
 	let url
 	var select
 	if (ev_type === "bucket") {
+		console.log(`update bucket!`)
 		data["project"] = document.querySelector('#project_options').value
 		data["StartTime"] = document.querySelector('.StartTime').value
 		data["EndTime"] = document.querySelector('.EndTime').value
@@ -233,16 +236,19 @@ function updateDataPage(event, ev_type) {
 		url = "/get_project_buckets"
 		select = $('#bucket_options')
 	} else if (ev_type === "versions") {
+		console.log(`update versions!`)
 		data["project"] = document.querySelector('#settings_activeproject').value
 		console.log(`project: `, data["project"])
-		url = "/get_version_list"
+		url = "/beeload/get/version"
 		select = $('#settings_version_list')
 	} else if (ev_type === "projects") {
+		console.log(`update projects!`)
 		data["project"] = document.querySelector('#bucket_options').value
 		console.log(`project: `, data["project"])
 		url = "/get_bucket_projects"
 		select = $('#project_options')
 	} else if (ev_type === "hosts") {
+		console.log(`update hosts!`)
 		url = "/get_host_list"
 		select = $('#settings_host')
 	}
@@ -284,22 +290,30 @@ function handleCompareRelease(event) {
 }
 
 function handleMetodicSet(event) {
-	let form = document.querySelector('.settings_page')
-	let bucket = form.querySelector('.bucket')
-	let page = form.querySelector('.page')
-	let version = form.querySelector('.version')
+	let form = document.querySelector('.settings_page');
+	let bucket = form.querySelector('.bucket');
+	let page = form.querySelector('.page');
+	let version = form.querySelector('.version');
 	let xhr = new XMLHttpRequest();
 	let data = {};
-	event.preventDefault()
-	data["bucket"] = bucket.value
-	data["version"] = version.value
-	data["page"] = page.value
-	console.log("JSON: ", JSON.stringify(data))
+	event.preventDefault();
+
+	// Валидация ввода для поля "page"
+	let pageNumber = page.value.replace(/\D/g, ''); // Оставляет только цифры
+	page.value = pageNumber;
+
+	data["bucket"] = bucket.value;
+	data["version"] = version.value;
+	data["page"] = page.value;
+	console.log("JSON: ", JSON.stringify(data));
+
+	//TODO: Реализация
+
 	xhr.open("POST", "/beeload/add/methodic", true);
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 	xhr.send(JSON.stringify(data));
-	let msg = form.querySelector('.msg')
-	msg.textContent = 'методика привязана'
+	let msg = form.querySelector('.msg');
+	msg.textContent = 'Методика привязана';
 }
 
 function handleVersionAdd(event) {
@@ -315,6 +329,22 @@ function handleVersionAdd(event) {
 	xhr.send(JSON.stringify(data));
 	let msg = form.querySelector('.msg')
 	msg.textContent = 'новая версия создана'
+}
+
+function handleConflPageAdd(event) {
+	let form = document.querySelector('.settings_page')
+	let page = form.querySelector('#confl_page_url')
+	let xhr = new XMLHttpRequest();
+	let data = {};
+	event.preventDefault()
+	data["page"] = page.value
+	console.log("JSON: ", JSON.stringify(data))
+	xhr.open("POST", "/beeload/add/confl_page", true);
+	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+	xhr.send(JSON.stringify(data));
+	let msg = form.querySelector('.msg')
+	msg.textContent = 'новая страница привязана'
+
 }
 
 function handleSetReportHomepage(event) {
@@ -367,8 +397,9 @@ function setActiveProject(event) {
 
 	// Выполняем действие с выбранным значением, например, отправляем на сервер
 	alert("Выбран проект: " + selectedValue);
+	updateDataPage(event, "versions")
 	let data = {
-		project: selectedValue
+		project_name: selectedValue
 	};
 	fetch('/beeload/set/project', {
 		method: 'POST',

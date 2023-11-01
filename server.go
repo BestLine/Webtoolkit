@@ -30,8 +30,11 @@ func setupProtectedRoutes(app *fiber.App) {
 	app.Post("/beeload/create/bucket", createBucket)
 	app.Post("/beeload/compare/release", compareRelease)
 	app.Post("/beeload/set/project", setActiveUserProject)
+	app.Post("/beeload/get/version", getVersion)
 	app.Post("/beeload/add/methodic", addMethodic) // TODO: добавить обработку методики
 	app.Post("/beeload/add/version", addVersion)
+	app.Post("/beeload/add/project", addProject)
+	app.Post("/beeload/add/confl_page", addConflPage)
 	app.Get("/", startPage)
 	app.Get("/main_page", getMainPage)
 	app.Get("/compare", getCompare)

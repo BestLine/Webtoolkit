@@ -1,0 +1,7 @@
+.part {
+    width: 100%;
+    font-size: 20px;
+    text-align: center;
+    height: 80px;
+    border: 2px solid black;
+}

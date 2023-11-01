@@ -2,14 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link rel="stylesheet" href="/css/admin_panel.css">
+    <script src="/js/admin_panel.js"></script>
+    <title>Панель администратора</title>
 </head>
 <body>
-    <div>Добавить пользователя к проекту</div>
-    <div>-</div>
+    <div class="part">
+        <a>Добавить новый проект</a>
+        <form class="adm_c_project" action="/submit" method="post">
+            <input type="text" name="project_name" placeholder="Введите название проекта" required>
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+    <div class="part">
+        <a>Добавить пользователя к проекту</a>
+        <form class="adm_add_user_to_project" action="/submit" method="post">
+            <select name="user" required>
+                <option value="" disabled selected>Выберите пользователя</option>
+                <option value="user1">Пользователь 1</option>
+                <option value="user2">Пользователь 2</option>
+                <option value="user3">Пользователь 3</option>
+            </select>
+            <select name="project" required>
+                <option value="" disabled selected>Выберите проект</option>
+                <option value="project1">Проект 1</option>
+                <option value="project2">Проект 2</option>
+                <option value="project3">Проект 3</option>
+            </select>
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+    <div>- в разработке -</div>
     <div>Перезапустить генераторы</div>
-    <div>Что то ещё</div>
-    <div>Что то ещё</div>
-    <div>Что то ещё</div>
+    <div>Нарезать генераторы(количество\мошну)</div>
+    <div>Привязать генераторы к проекту</div>
 </body>
 </html>
