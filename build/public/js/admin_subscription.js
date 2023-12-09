@@ -22,9 +22,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: new URLSearchParams(userData)
+
         })
-            .then(response => response.json())
-            .then(data => console.log('Server response:', data))
-            .catch(error => console.error('Error:', error));
+            .then(response => document.querySelector('.error_message').textContent = response.status)
+            .then(data => document.querySelector('.error_message').textContent =  data)
+            .catch(error => document.querySelector('.error_message').textContent =  error);
     });
 });

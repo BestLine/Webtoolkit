@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function() {
             jsonObject[key] = value;
         });
         var jsonData = JSON.stringify(jsonObject);
+        let msg = document.querySelector('.error_message')
         fetch(form_add_project.action, {
             method: form_add_project.method,
             body: jsonData,
@@ -21,9 +22,11 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => response.text())
             .then(data => {
                 console.log(data);
+                msg.textContent = data
             })
             .catch(error => {
                 console.error('Ошибка:', error);
+                msg.textContent = ('Ошибка:' + error);
             });
     });
 
@@ -36,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function() {
             jsonObject[key] = value;
         });
         var jsonData = JSON.stringify(jsonObject);
+        let msg = document.querySelector('.error_message')
         fetch(form_add_user_to_project.action, {
             method: form_add_project.method,
             body: jsonData,
@@ -46,9 +50,11 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(response => response.text())
             .then(data => {
                 console.log(data);
+                msg.textContent = data
             })
             .catch(error => {
                 console.error('Ошибка:', error);
+                msg.textContent = ('Ошибка:' + error);
             });
     });
 });
