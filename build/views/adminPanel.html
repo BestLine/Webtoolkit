@@ -17,24 +17,20 @@
     <div class="part">
         <a>Добавить пользователя к проекту</a>
         <form class="adm_add_user_to_project" action="/submit" method="post">
-            <select name="user" required>
-                <option value="" disabled selected>Выберите пользователя</option>
-                <option value="user1">Пользователь 1</option>
-                <option value="user2">Пользователь 2</option>
-                <option value="user3">Пользователь 3</option>
-            </select>
-            <select name="project" required>
-                <option value="" disabled selected>Выберите проект</option>
-                <option value="project1">Проект 1</option>
-                <option value="project2">Проект 2</option>
-                <option value="project3">Проект 3</option>
-            </select>
+            {{ unescape .UserProjectsList}}
             <button type="submit">Добавить</button>
         </form>
     </div>
     <div>- в разработке -</div>
-    <div>Перезапустить генераторы</div>
-    <div>Нарезать генераторы(количество\мошну)</div>
-    <div>Привязать генераторы к проекту</div>
+    <div class="part">
+        <a>Добавить подписку пользователя</a>
+{{/*        <button class="l_btn" >Добавить подписку пользователя</button>*/}}
+        <a class="l_btn" href="/adminPanel/subscription">Добавить</a>
+    </div>
+    <div class="part">
+        Перезапустить генераторы
+        Нарезать генераторы(количество\мошну)
+        Привязать генераторы к проекту
+    </div>
 </body>
 </html>

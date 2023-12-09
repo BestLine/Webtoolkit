@@ -1,0 +1,9 @@
+.error_message {
+    background-color: #000; /* Цвет фона статус-бара */
+    color: #fff; /* Цвет текста статус-бара */
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}

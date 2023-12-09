@@ -188,7 +188,10 @@ function NavbarLeftHandler() {
 					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
 						"color: red; " +
 						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
-				}})
+				} else {
+					document.querySelector('.formWithValidation').addEventListener('submit', handleStartTest)
+				}
+			})
 		}
 	});
 }
@@ -222,7 +225,6 @@ function toggleNavbarLeft(e) {
 }
 
 function updateDataPage(event, ev_type) {
-
 	let xhr = new XMLHttpRequest();
 	let data = {};
 	let url
@@ -289,6 +291,21 @@ function handleCompareRelease(event) {
 	xhr.send(JSON.stringify(data));
 }
 
+function handleStartTest(event) {
+	let form = document.querySelector('.formWithValidation')
+	let git_url = form.querySelector('.gitUrl')
+	let xhr = new XMLHttpRequest();
+	let data = {};
+	event.preventDefault()
+	data["gitlab"] = git_url.value
+	data["count"] = 1
+	data["resource"] = "2cpu4ram"
+	console.log("JSON: ", JSON.stringify(data))
+	xhr.open("POST", "http://172.17.155.33:9999/create", true);
+	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+	xhr.send(JSON.stringify(data));
+}
+
 function handleMetodicSet(event) {
 	let form = document.querySelector('.settings_page');
 	let bucket = form.querySelector('.bucket');
@@ -297,8 +314,6 @@ function handleMetodicSet(event) {
 	let xhr = new XMLHttpRequest();
 	let data = {};
 	event.preventDefault();
-
-	// Валидация ввода для поля "page"
 	let pageNumber = page.value.replace(/\D/g, ''); // Оставляет только цифры
 	page.value = pageNumber;
 
@@ -312,8 +327,8 @@ function handleMetodicSet(event) {
 	xhr.open("POST", "/beeload/add/methodic", true);
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 	xhr.send(JSON.stringify(data));
-	let msg = form.querySelector('.msg');
-	msg.textContent = 'Методика привязана';
+	let msg = document.querySelector('.error_message')
+	msg.textContent = 'Статус: Методика привязана';
 }
 
 function handleVersionAdd(event) {
@@ -327,8 +342,8 @@ function handleVersionAdd(event) {
 	xhr.open("POST", "/beeload/add/version", true);
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 	xhr.send(JSON.stringify(data));
-	let msg = form.querySelector('.msg')
-	msg.textContent = 'новая версия создана'
+	let msg = document.querySelector('.error_message')
+	msg.textContent = 'Статус: Новая версия создана'
 }
 
 function handleConflPageAdd(event) {
@@ -342,8 +357,8 @@ function handleConflPageAdd(event) {
 	xhr.open("POST", "/beeload/add/confl_page", true);
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 	xhr.send(JSON.stringify(data));
-	let msg = form.querySelector('.msg')
-	msg.textContent = 'новая страница привязана'
+	let msg = document.querySelector('.error_message')
+	msg.textContent = 'Статус: Новая страница привязана'
 
 }
 
@@ -394,111 +409,51 @@ function handleSetReportHomepage(event) {
 function setActiveProject(event) {
 	var select = document.getElementById("settings_activeproject");
 	var selectedValue = select.options[select.selectedIndex].value;
-
+	let msg = document.querySelector('.error_message')
+	let xhr = new XMLHttpRequest();
+	let data = {};
 	// Выполняем действие с выбранным значением, например, отправляем на сервер
-	alert("Выбран проект: " + selectedValue);
+	// alert("Выбран проект: " + selectedValue);
+	// msg.textContent = "Выбран проект: "+ selectedValue
 	updateDataPage(event, "versions")
-	let data = {
-		project_name: selectedValue
-	};
-	fetch('/beeload/set/project', {
-		method: 'POST',
-			headers: {
-			'Content-Type': 'application/json; charset=UTF-8'
-		},
-		body: JSON.stringify(data)
-	})
-	.then(response => {
-		if (response.ok) {
-			if (response.redirected) {
-				window.location.href = response.url;
-			} else {
-				let response = this.responseText;
-				console.log(response);
-				responceMsg.textContent = response;
-				responceMsg.style.color = '#33cc33';
-				responceMsg.style.border = '3px solid #33cc33';
-				responceMsg.style.animation = "errorAnim .2s forwards";
-				responceMsg.style.textAlign = 'center';
-				responceMsg.style.fontSize = '24px';
-				anim_border.style.border = '0px solid #33cc33';
-				anim_border.style.transition = 'border-width 0.5s';
-				anim_border.style.borderWidth = '5px';
-				anim_border.classList.add('animation');
-			}
+	data["project_name"] = selectedValue
+	xhr.open("POST", "/beeload/set/project", true);
+	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+	xhr.addEventListener("load", function() {
+		if (xhr.status === 200) { // Коды ответов
+			msg.textContent = "Выбран проект: "+ selectedValue
+			// alert("Успешный запрос!");
+		} else if (xhr.status === 404) {
+			msg.textContent = "Ресурс не найден: " + xhr.status
+			alert("Ресурс не найден.");
+		} else if (xhr.status === 500) {
+			msg.textContent = "Внутренняя ошибка сервера: " + xhr.status
+			// alert("Внутренняя ошибка сервера.");
 		} else {
-			responceMsg.textContent = "[ERROR] Код ответа сервера: " + this.status + this.responseText;
-			responceMsg.style.color = '#F65656';
-			responceMsg.style.textAlign = 'center';
-			responceMsg.style.fontSize = '24px';
-			anim_border.style.border = '0px solid #F65656';
-			anim_border.style.transition = 'border-width 0.5s';
-			anim_border.style.borderWidth = '5px';
-			anim_border.classList.add('animation');
-			responceMsg.style.border = '3px solid #F65656';
-			responceMsg.style.animation = "errorAnim .2s forwards";
+			msg.textContent = "Неизвестный код ответа: " + xhr.status
+			// alert("Неизвестный код ответа: " + xhr.status);
 		}
-	})
-		.catch(error => {
-			responceMsg.textContent = "[ERROR] Код ответа сервера: " + this.status + this.responseText;
-			// Обработка ошибок сети или других проблем
-		});
-
+	});
+	xhr.send(JSON.stringify(data));
 }
 
 function handleCreateBucket(event) {
 	event.preventDefault();
-	// TODO: переделать реализацию под новое меню настроек
 	let host =document.querySelector('#settings_host')
 	let bucket = document.querySelector('#new_bucket_name');
-	let data = {
-		host: host.value,
-		bucket: bucket.value
-	};
-
-	fetch('/beeload/create/bucket', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json; charset=UTF-8'
-		},
-		body: JSON.stringify(data)
-	})
-		.then(response => {
-			if (response.ok) {
-				if (response.redirected) {
-					window.location.href = response.url;
-				} else {
-					let response = this.responseText;
-					console.log(response);
-					responceMsg.textContent = response;
-					responceMsg.style.color = '#33cc33';
-					responceMsg.style.border = '3px solid #33cc33';
-					responceMsg.style.animation = "errorAnim .2s forwards";
-					responceMsg.style.textAlign = 'center';
-					responceMsg.style.fontSize = '24px';
-					anim_border.style.border = '0px solid #33cc33';
-					anim_border.style.transition = 'border-width 0.5s';
-					anim_border.style.borderWidth = '5px';
-					anim_border.classList.add('animation');
-				}
-			} else {
-				responceMsg.textContent = "[ERROR] Код ответа сервера: " + this.status + this.responseText;
-				responceMsg.style.color = '#F65656';
-				responceMsg.style.textAlign = 'center';
-				responceMsg.style.fontSize = '24px';
-				anim_border.style.border = '0px solid #F65656';
-				anim_border.style.transition = 'border-width 0.5s';
-				anim_border.style.borderWidth = '5px';
-				anim_border.classList.add('animation');
-				responceMsg.style.border = '3px solid #F65656';
-				responceMsg.style.animation = "errorAnim .2s forwards";
-			}
-		})
-		.catch(error => {
-			// Обработка ошибок сети или других проблем
-		});
+	console.log("handleCreateBucket")
+	let xhr = new XMLHttpRequest();
+	let data = {};
+	event.preventDefault()
+	data["host"] = host.value
+	data["bucket"] = bucket.value
+	console.log("JSON: ", JSON.stringify(data))
+	xhr.open("POST", "/beeload/create/bucket", true);
+	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+	xhr.send(JSON.stringify(data));
+	let msg = document.querySelector('.error_message')
+	msg.textContent = "Статус: Новый бакет " + data["bucket"] + " создан"
 }
-
 
 function handleCompare(event) {
 	let form = document.querySelector('.formWithValidation')
@@ -553,29 +508,9 @@ function handleMakeReport(event) {
 		var responceMsg = document.querySelector('.error_message');
 		var anim_border = document.querySelector('.form_wrapper');
 		if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-			let response = JSON.parse(this.responseText);
-			console.log(response);
-			responceMsg.textContent = response;
-			responceMsg.style.color = '#06a142';
-			responceMsg.style.border = '3px solid ##06a142';
-			responceMsg.style.animation="errorAnim .2s forwards";
-			responceMsg.style.textAlign = 'center';
-			responceMsg.style.fontSize = '24px';
-			anim_border.style.border = '0px solid #33cc33';
-			anim_border.style.transition = 'border-width 0.5s';
-			anim_border.style.borderWidth = '5px';
-			anim_border.classList.add('animation');
+
 		} else if  (this.status !== 200) {
-			responceMsg.textContent = "[ERROR] Код ответа сервера: "+ this.status;
-			responceMsg.style.color = '#F65656';
-			responceMsg.style.textAlign = 'center';
-			responceMsg.style.fontSize = '24px';
-			anim_border.style.border = '0px solid #F65656';
-			anim_border.style.transition = 'border-width 0.5s';
-			anim_border.style.borderWidth = '5px';
-			anim_border.classList.add('animation');
-			responceMsg.style.border = '3px solid #F65656';
-			responceMsg.style.animation="errorAnim .2s forwards";
+
 		}
 	}
 	xhr.send(JSON.stringify(data));

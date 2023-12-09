@@ -4,17 +4,29 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"log"
 	_ "modernc.org/sqlite"
 )
 
-func createSQLiteDB() (*sql.DB, error) {
-	// Открываем или создаем файл базы данных SQLite
-	db, err := sql.Open("sqlite", "./mydatabase.db")
-	if err != nil {
-		return nil, err
-	}
+func DBInit() {
+	var err error
 
+	// Инициализация пула подключений к SQLite3
+	db, err = sql.Open("sqlite", "./mydatabase.db")
+	if err != nil {
+		fmt.Println("Error opening database:", err)
+		return
+	}
+	//defer db.Close()
+
+	// Установка максимального числа открытых соединений в пуле
+	db.SetMaxOpenConns(20)
+
+	// Установка максимального числа соединений в пуле, которые могут быть использованы одновременно
+	db.SetMaxIdleConns(10)
+}
+
+func createSQLiteDB() error {
+	var err error
 	// Создаем таблицы (если их нет)
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
@@ -91,15 +103,29 @@ func createSQLiteDB() (*sql.DB, error) {
 			bucket_name TEXT NOT NULL UNIQUE 
 		)
 	`)
+
+	_, err = db.Exec(`
+    INSERT OR IGNORE INTO users (username, password) VALUES ('admin', '123')
+`)
+
+	_, err = db.Exec(`
+    INSERT OR IGNORE INTO roles (name) VALUES ('admin')
+`)
+
+	_, err = db.Exec(`
+    INSERT OR IGNORE INTO user_roles (user_id, role_id)
+    VALUES (
+        (SELECT id FROM users WHERE username = 'admin'),
+        (SELECT id FROM roles WHERE name = 'admin')
+    )
+`)
 	if err != nil {
-		db.Close()
-		return nil, err
+		return err
 	}
-	//defer db.Close()
-	return db, nil
+	return nil
 }
 
-func registerUser(db *sql.DB, username, password, email string, roles []string) error {
+func registerUser(username, password, email string, roles []string) error {
 	// Проверяем, что пользователь с таким именем пользователя еще не зарегистрирован
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE username = ?", username).Scan(&count)
@@ -145,7 +171,7 @@ func registerUser(db *sql.DB, username, password, email string, roles []string) 
 	return nil
 }
 
-func checkUserCredentials(db *sql.DB, username, password string) (bool, error) {
+func checkUserCredentials(username, password string) (bool, error) {
 	row := db.QueryRow("SELECT username, password FROM users WHERE username = ?", username)
 
 	var storedUsername, storedPassword string
@@ -169,7 +195,7 @@ func checkUserCredentials(db *sql.DB, username, password string) (bool, error) {
 	return false, nil
 }
 
-func getUserRole(db *sql.DB, username string) string {
+func getUserRole(username string) string {
 	// Проверяем наличие роли у пользователя лениво
 	row := db.QueryRow("select name as role from users left join user_roles ur on users.id = ur.user_id left join roles r on r.id = ur.role_id where username=?", username)
 	var storedRole string
@@ -177,11 +203,10 @@ func getUserRole(db *sql.DB, username string) string {
 	if err != nil {
 		return "Ошибка при выполнении запроса"
 	}
-	//db.Close()
 	return storedRole
 }
 
-func hasUserRole(db *sql.DB, username, role string) (bool, error) {
+func hasUserRole(username, role string) (bool, error) {
 	// Проверяем наличие роли у пользователя серьёзно
 	//query := "SELECT COUNT(*) FROM users WHERE username = ? AND role = ?"
 	query := "SELECT COUNT(*) FROM users left join user_roles on users.id = user_roles.user_id left join roles on user_roles.role_id = roles.id WHERE users.username = ? AND roles.name = ?"
@@ -190,11 +215,34 @@ func hasUserRole(db *sql.DB, username, role string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	//db.Close()
 	return count > 0, nil
 }
 
-func GetUserActiveProject(db *sql.DB, username string) (string, error) {
+func GetAllUsers() ([]string, error) {
+	query := "SELECT username FROM users;"
+	rows, err := db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var userNames []string
+	for rows.Next() {
+		var userName string
+		err := rows.Scan(&userName)
+		if err != nil {
+			return nil, err
+		}
+		userNames = append(userNames, userName)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return userNames, nil
+}
+
+func GetUserActiveProject(username string) (string, error) {
 	query := "SELECT projects.project_name " +
 		"FROM user_projects " +
 		"LEFT JOIN projects ON user_projects.project_id = projects.id " +
@@ -202,15 +250,14 @@ func GetUserActiveProject(db *sql.DB, username string) (string, error) {
 		"WHERE users.username = '" + username + "' AND user_projects.active = 1;"
 
 	var name string
-	err := db.QueryRow(query, username).Scan(&name)
+	err := db.QueryRow(query).Scan(&name)
 	if err != nil {
 		return "", err
 	}
-	//db.Close()
 	return name, nil
 }
 
-func GetUserProjects(db *sql.DB, username string) ([]string, error) {
+func GetUserProjects(username string) ([]string, error) {
 	query := "SELECT projects.project_name " +
 		"FROM user_projects " +
 		"LEFT JOIN projects ON user_projects.project_id = projects.id " +
@@ -236,13 +283,11 @@ func GetUserProjects(db *sql.DB, username string) ([]string, error) {
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	//db.Close()
 	return projectNames, nil
 }
 
-func GetAllProjects(db *sql.DB) ([]string, error) {
+func GetAllProjects() ([]string, error) {
 	query := "SELECT project_name FROM projects;"
-
 	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
@@ -262,12 +307,10 @@ func GetAllProjects(db *sql.DB) ([]string, error) {
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	//db.Close()
 	return projectNames, nil
 }
 
 func SetActiveProject(username string, projectToActivate string, isAdmin bool) error {
-	db := getDbConn()
 	// Если пользователь является администратором, устанавливаем указанный проект как активный
 	if isAdmin {
 		// Получаем ID пользователя по его имени
@@ -322,11 +365,10 @@ func SetActiveProject(username string, projectToActivate string, isAdmin bool) e
 		logrus.Debug("QW_2 = ", updateAllProjectsQuery, " username=", username, " projectToActivate=", projectToActivate)
 		_, err = db.Exec(updateAllProjectsQuery, projectToActivate, username)
 	}
-	db.Close()
 	return nil
 }
 
-func AddNewProject(db *sql.DB, ProjectName string) error {
+func AddNewProject(ProjectName string) error {
 	Query := "INSERT OR IGNORE INTO projects (project_name) VALUES (?);"
 	logrus.Debug("QW = ", Query, " ProjectName=", ProjectName)
 	_, err := db.Exec(Query, ProjectName)
@@ -338,7 +380,7 @@ func AddNewProject(db *sql.DB, ProjectName string) error {
 	//TODO: new feature
 }
 
-func AddProjectVersion(db *sql.DB, Version string, ProjectName string) error {
+func AddProjectVersion(Version string, ProjectName string) error {
 	Query := "INSERT OR IGNORE INTO project_versions (project_id, version) SELECT p.id, ? FROM projects p WHERE p.project_name = ?;"
 	logrus.Debug("QW = ", Query, " ProjectName=", ProjectName, " Version=", Version)
 	_, err := db.Exec(Query, Version, ProjectName)
@@ -350,7 +392,7 @@ func AddProjectVersion(db *sql.DB, Version string, ProjectName string) error {
 	//TODO: new feature
 }
 
-func GetProjectVersion(db *sql.DB, projectName string) ([]string, error) {
+func GetProjectVersion(projectName string) ([]string, error) {
 	rows, err := db.Query("SELECT version FROM project_versions WHERE project_id=(SELECT p.id FROM projects p WHERE p.project_name = ?)", projectName)
 	if err != nil {
 		return nil, err
@@ -375,19 +417,17 @@ func GetProjectVersion(db *sql.DB, projectName string) ([]string, error) {
 }
 
 func AddProjectMethodic(PageId int, Version string, ProjectName string) error {
-	db := getDbConn()
 	Query := "INSERT OR IGNORE INTO project_methodics (project_id, version, methodic_conf_id) SELECT p.id,?, ? FROM projects p WHERE p.project_name = ?;"
 	_, err := db.Exec(Query, PageId, Version, ProjectName)
 	logrus.Debug("QW = ", Query, " ProjectName=", ProjectName, " PageId=", PageId, " Version=", Version)
 	if err != nil {
 		return err
 	}
-	db.Close()
 	return nil
 	//TODO: new feature
 }
 
-func AddProjectBucket(db *sql.DB, BucketName string, BucketUrl string, ProjectName string) error {
+func AddProjectBucket(BucketName string, BucketUrl string, ProjectName string) error {
 	Query := "INSERT OR IGNORE INTO project_buckets (project_id, bucket_url, bucket_name) SELECT p.id, ?, ? FROM projects p WHERE p.project_name = ?;"
 	logrus.Debug("QW = ", Query, " ProjectName=", ProjectName, " BucketUrl=", BucketUrl)
 	_, err := db.Exec(Query, BucketUrl, BucketName, ProjectName)
@@ -399,33 +439,12 @@ func AddProjectBucket(db *sql.DB, BucketName string, BucketUrl string, ProjectNa
 }
 
 func AddProjectRootPage(PageId int, ProjectName string) error {
-	db := getDbConn()
 	Query := "INSERT OR IGNORE INTO project_root_page (project_id, page_id) SELECT p.id, ? FROM projects p WHERE p.project_name = ?;"
 	logrus.Debug("QW = ", Query, " ProjectName=", ProjectName, " PageId=", PageId)
 	_, err := db.Exec(Query, PageId, ProjectName)
 	if err != nil {
 		return err
 	}
-	db.Close()
 	return nil
 	//TODO: new feature
-}
-
-// spec
-func getDbConn() (db *sql.DB) {
-	db, err := createSQLiteDB()
-	if err != nil {
-		fmt.Println("Ошибка при создании базы данных:", err)
-		return
-	}
-	return db
-}
-
-func dbInit() *sql.DB {
-	db, err := sql.Open("sqlite", "./mydatabase.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-	return db
 }

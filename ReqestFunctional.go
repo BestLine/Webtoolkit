@@ -16,8 +16,7 @@ func getReportHistory(c *fiber.Ctx) error {
 	value := c.Locals("user")
 	claims, ok := (value).(*jwt.MapClaims)
 	username, ok := (*claims)["username"].(string)
-	db := getDbConn()
-	activeProject, err := GetUserActiveProject(db, username)
+	activeProject, err := GetUserActiveProject(username)
 	if !ok {
 		// Обработка ошибки преобразования
 		logrus.Error("getSettings: username conversion failed")
@@ -35,8 +34,7 @@ func getTestHistory(c *fiber.Ctx) error {
 	value := c.Locals("user")
 	claims, ok := (value).(*jwt.MapClaims)
 	username, ok := (*claims)["username"].(string)
-	db := getDbConn()
-	activeProject, err := GetUserActiveProject(db, username)
+	activeProject, err := GetUserActiveProject(username)
 	if !ok {
 		// Обработка ошибки преобразования
 		logrus.Error("getSettings: username conversion failed")
@@ -54,8 +52,7 @@ func addMethodic(c *fiber.Ctx) error {
 	value := c.Locals("user")
 	claims, _ := (value).(*jwt.MapClaims)
 	username, _ := (*claims)["username"].(string)
-	db := getDbConn()
-	activeProject, err := GetUserActiveProject(db, username)
+	activeProject, err := GetUserActiveProject(username)
 	methodic := new(MethodicSet)
 	if err = c.BodyParser(methodic); err != nil {
 		logrus.Error("addMethodic parse ERROR: ", err)
@@ -75,14 +72,13 @@ func addVersion(c *fiber.Ctx) error {
 	value := c.Locals("user")
 	claims, _ := (value).(*jwt.MapClaims)
 	username, _ := (*claims)["username"].(string)
-	db := getDbConn()
-	activeProject, err := GetUserActiveProject(db, username)
+	activeProject, err := GetUserActiveProject(username)
 	version := new(Version)
 	if err = c.BodyParser(version); err != nil {
 		logrus.Error(err)
 		return err
 	}
-	err = AddProjectVersion(db, version.Value, activeProject)
+	err = AddProjectVersion(version.Value, activeProject)
 	if err != nil {
 		logrus.Error("addVersion ERROR: ", err)
 		return err
@@ -95,9 +91,8 @@ func getVersion(c *fiber.Ctx) error {
 	value := c.Locals("user")
 	claims, _ := (value).(*jwt.MapClaims)
 	username, _ := (*claims)["username"].(string)
-	db := getDbConn()
-	activeProject, err := GetUserActiveProject(db, username)
-	res, err := GetProjectVersion(db, activeProject)
+	activeProject, err := GetUserActiveProject(username)
+	res, err := GetProjectVersion(activeProject)
 	if err != nil {
 		logrus.Error("getVersion ERROR: ", err)
 	}
@@ -117,9 +112,8 @@ func createBucket(c *fiber.Ctx) error {
 		logrus.Error(err)
 		return err
 	}
-	db := getDbConn()
-	activeProject, err := GetUserActiveProject(db, username)
-	err = AddProjectBucket(db, newBucket.Bucket, newBucket.Host, activeProject)
+	activeProject, err := GetUserActiveProject(username)
+	err = AddProjectBucket(newBucket.Bucket, newBucket.Host, activeProject)
 	if err != nil {
 		logrus.Error("createBucket ERROR: ", err)
 		return err
@@ -203,8 +197,7 @@ func addProject(c *fiber.Ctx) error {
 		return err
 	}
 	logrus.Debug("Project = ", project.Name)
-	db := getDbConn()
-	err := AddNewProject(db, project.Name)
+	err := AddNewProject(project.Name)
 	if err != nil {
 		return err
 	}
@@ -223,8 +216,7 @@ func addConflPage(c *fiber.Ctx) error {
 		logrus.Error("addConflPage parse ERROR: ", err)
 		return err
 	}
-	db := getDbConn()
-	activeProject, err := GetUserActiveProject(db, username)
+	activeProject, err := GetUserActiveProject(username)
 	int_page, err := strconv.Atoi(page.Page)
 	AddProjectRootPage(int_page, activeProject)
 	if err != nil {
@@ -239,21 +231,20 @@ func setActiveUserProject(c *fiber.Ctx) error {
 	value := c.Locals("user")
 	claims, _ := (value).(*jwt.MapClaims)
 	username, _ := (*claims)["username"].(string)
-	db := getDbConn()
 	bucket := new(Project)
 	if err := c.BodyParser(bucket); err != nil {
 		logrus.Error(err)
 		return err
 	}
 	logrus.Debug("Project = ", bucket.Name)
-	isAdmin, err := hasUserRole(db, username, "admin")
+	isAdmin, err := hasUserRole(username, "admin")
 	//err = SetActiveProject(db, username, bucket.Name, isAdmin)
 	err = SetActiveProject(username, bucket.Name, isAdmin)
 	if err != nil {
 		logrus.Error("setActiveUserProject ERROR: ", err)
 		return err
 	}
-	activeProject, err := GetUserActiveProject(db, username)
+	activeProject, err := GetUserActiveProject(username)
 	if err != nil {
 		logrus.Error("GetUserActiveProject ERROR: ", err)
 		return err

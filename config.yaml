@@ -1,6 +1,7 @@
 server:
   port: 7777
   debug: true
+  db_debug: true
   log_level: debug # debug\panic\fatal\error\warn\warning\info\trace
   log_filename: "./frontend.log"
 backend:

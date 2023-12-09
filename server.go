@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
@@ -48,12 +49,15 @@ func setupProtectedRoutes(app *fiber.App) {
 	app.Get("/make_report", getMakeReport)
 	app.Get("/start_test", getStartTest)
 	app.Get("/adminPanel", getAdminPanel)
+	app.Get("/adminPanel/subscription", getAdminSubscription)
 	app.Post("/get_project_buckets", GetProjectBuckets)
 	app.Post("/get_bucket_projects", GetBucketProjects)
 	app.Get("/compare_release", getCompareRelease)
 	app.Post("/get_version_list", GetVersionsList)
 	app.Post("/get_host_list", GetHostList)
 }
+
+var db *sql.DB
 
 func main() {
 	viper.SetConfigFile("config.yaml")
@@ -86,6 +90,13 @@ func main() {
 	app.Use(jwtMiddleware())
 	setupProtectedRoutes(app)
 
+	DBInit()
+	err := createSQLiteDB()
+	if err != nil {
+		logrus.Error("Error creating db:", err)
+		return
+	}
+
 	// Запуск сервера в горутине
 	go func() {
 		port := viper.GetInt("server.port")
@@ -102,6 +113,7 @@ func main() {
 
 	logrus.Error("Shutting down...")
 	fmt.Println("Shutting down...")
+	db.Close()
 	_, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := app.Shutdown(); err != nil {
@@ -109,3 +121,8 @@ func main() {
 		fmt.Println("Error shutting down server:", err)
 	}
 }
+
+//TODO:
+//поправить css на странице запуска тестов
+//довабить список генераторов
+//придумать вывод ошибок и ответов

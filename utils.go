@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -193,11 +192,11 @@ func get_bucket_list(c *fiber.Ctx) []string {
 }
 
 func get_project_list(c *fiber.Ctx) []string {
-	value := c.Locals("user")
-	claims, _ := (value).(*jwt.MapClaims)
-	username, _ := (*claims)["username"].(string)
-	db := getDbConn()
-	activeProject, err := GetUserActiveProject(db, username)
+	//value := c.Locals("user")
+	//claims, _ := (value).(*jwt.MapClaims)
+	//username, _ := (*claims)["username"].(string)
+	//db := getDbConn()
+	//activeProject, err := GetUserActiveProject(db, username)
 	url := "/beeload/get/projectList"
 	//res := sendGet(c, url)
 	res := sendRequest(c, "Get", url)
@@ -307,4 +306,53 @@ func RespToByteReader(response *http.Response) []byte {
 		buf = append(buf, chunk[:n]...)
 	}
 	return buf
+}
+
+func select_all_users() string {
+	logrus.Debug("select_all_users")
+	users, _ := GetAllUsers()
+	res := "<select name=\"user\" required><option value=\"\" disabled selected>Выберите пользователя</option>"
+	for _, userName := range users {
+		res += "<option value=\"" + userName + "\">" + userName + "</option>"
+	}
+	res += "</select>"
+	return res
+}
+
+func select_all_projects() string {
+	logrus.Debug("select_all_users")
+	projects, _ := GetAllProjects()
+	res := "<select class=\"project_options\" name=\"project\" required><option value=\"\" disabled selected>Выберите проект</option>"
+	for _, projectName := range projects {
+		res += "<option value=\"" + projectName + "\">" + projectName + "</option>"
+	}
+	res += "</select>"
+	return res
+}
+
+func checkbox_all_projects() string {
+	projects, _ := GetAllProjects()
+	res := "<div id=\"projectList\">"
+	for _, projectName := range projects {
+		res += "<input type=\"checkbox\" id=\"" + projectName + "\" name=\"projects\" value=\"" + projectName + "\">\n"
+		res += "<label for=\"" + projectName + "\">" + projectName + "</label><br>\n"
+	}
+	res += "</div>"
+	return res
+}
+
+func make_user_project_list() string {
+	logrus.Debug("make_user_project_list")
+	projects, _ := GetAllProjects()
+	users, _ := GetAllUsers()
+	res := "<select name=\"user\" required><option value=\"\" disabled selected>Выберите пользователя</option>"
+	for _, userName := range users {
+		res += "<option value=\"" + userName + "\">" + userName + "</option>"
+	}
+	res += "</select><select name=\"project\" required>\n\t       <option value=\"\" disabled selected>Выберите проект</option>"
+	for _, projectName := range projects {
+		res += "<option value=\"" + projectName + "\">" + projectName + "</option>"
+	}
+	res += "</select>"
+	return res
 }

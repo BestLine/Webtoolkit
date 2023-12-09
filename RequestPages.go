@@ -81,13 +81,22 @@ func getCompare(c *fiber.Ctx) error {
 func getCompareRelease(c *fiber.Ctx) error {
 	logrus.Debug("getCompareRelease")
 	return c.Render("relise_policy",
-		fiber.Map{"Buckets": add_tags(get_bucket_list(c)), "Projects": `<option>Выберите бакет</option>`})
+		fiber.Map{"Buckets": add_tags(get_bucket_list(c)), "Projects": `<option>Выберите бакет disabled</option>`})
 }
 
 func getMakeReport(c *fiber.Ctx) error {
 	logrus.Debug("getMakeReport")
+	value := c.Locals("user")
+	claims, _ := (value).(*jwt.MapClaims)
+	username, _ := (*claims)["username"].(string)
+	activeProject, _ := GetUserActiveProject(username)
+	projectsList, _ := GetUserProjects(username)
 	return c.Render("make_report",
-		fiber.Map{"Buckets": `<option>Выберите хост</option>`, "Projects": add_tags(get_project_list(c))})
+		fiber.Map{"Buckets": `<option style=" display: none;">Выберите хост</option>`,
+			"Projects": make_settings_projects_list(activeProject, projectsList)})
+	//	return c.Render("make_report",
+	//fiber.Map{"Buckets": `<option style=" display: none;">Выберите хост</option>`,
+	//	"Projects": select_all_projects()})
 }
 
 func getCreateBucket(c *fiber.Ctx) error {
@@ -99,7 +108,7 @@ func getCreateBucket(c *fiber.Ctx) error {
 func getAdminPanel(c *fiber.Ctx) error {
 	logrus.Debug("getAdminPanel")
 	return c.Render("adminPanel",
-		fiber.Map{"Buckets": add_tags(get_bucket_list(c))})
+		fiber.Map{"UserProjectsList": make_user_project_list()})
 }
 
 func getStartTest(c *fiber.Ctx) error {
@@ -113,10 +122,9 @@ func getSettings(c *fiber.Ctx) error {
 	value := c.Locals("user")
 	claims, ok := (value).(*jwt.MapClaims)
 	username, ok := (*claims)["username"].(string)
-	db := getDbConn()
-	activeProject, err := GetUserActiveProject(db, username)
-	projectsList, err := GetUserProjects(db, username)
-	isAdmin, err := hasUserRole(db, username, "admin")
+	activeProject, err := GetUserActiveProject(username)
+	projectsList, err := GetUserProjects(username)
+	isAdmin, err := hasUserRole(username, "admin")
 	logrus.Debug("is_admin: ", isAdmin)
 	if !ok {
 		// Обработка ошибки преобразования
@@ -128,15 +136,15 @@ func getSettings(c *fiber.Ctx) error {
 	}
 	additional := ""
 	if isAdmin {
-		projectsList, _ = GetAllProjects(db)
+		projectsList, _ = GetAllProjects()
 		activeProject = "Выберите проект"
-		additional = "        <button class=\"l_btn\">Добавить сценарий</button>\n        <a class=\"l_btn\" href=\"/adminPanel\">Администрирование</a>"
+		additional = "<a class=\"l_btn\" href=\"/adminPanel\">Администрирование</a>"
 		return c.Render("settings",
 			fiber.Map{
 				"User":          "Текущий пользователь: " + username,
 				"Additional":    additional,
-				"Versions":      "<option selected>Выберите версию</option>",
-				"HostList":      "<option selected>Выберите хост</option>",
+				"Versions":      "<option disabled selected>Выберите версию</option>",
+				"HostList":      "<option disabled selected>Выберите хост</option>",
 				"ActiveProject": make_settings_projects_list(activeProject, projectsList)})
 	} else {
 		additional = ""
@@ -144,8 +152,14 @@ func getSettings(c *fiber.Ctx) error {
 			fiber.Map{
 				"User":          "Текущий пользователь: " + username,
 				"Additional":    additional,
-				"Versions":      "<option selected>Выберите версию</option>",
-				"HostList":      "<option selected>Выберите хост</option>",
+				"Versions":      "<option disabled selected>Выберите версию</option>",
+				"HostList":      "<option disabled selected>Выберите хост</option>",
 				"ActiveProject": make_settings_projects_list(activeProject, projectsList)})
 	}
+}
+
+func getAdminSubscription(c *fiber.Ctx) error {
+	logrus.Debug("getAdminSubscription")
+	return c.Render("adminSubscription",
+		fiber.Map{"SelectUsers": select_all_users(), "SelectProjects": checkbox_all_projects()})
 }

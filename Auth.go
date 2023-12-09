@@ -11,15 +11,14 @@ import (
 func loginHandler(c *fiber.Ctx) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
-	db := getDbConn()
-	check, err := checkUserCredentials(db, username, password)
+	check, err := checkUserCredentials(username, password)
 	if !check {
 		logrus.Error("Invalid credentials! Username: ", username, " PWD: ", password)
 		return c.Render("login",
 			fiber.Map{"error": "Не верное имя пользователя или пароль!"})
 	}
 
-	role := getUserRole(db, username)
+	role := getUserRole(username)
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["username"] = username
@@ -97,8 +96,7 @@ func register(c *fiber.Ctx) error {
 	password := c.FormValue("password")
 	email := c.FormValue("email")
 	logrus.Debug("username: ", username, " password: ", password, " email: ", email)
-	db := getDbConn()
-	err := registerUser(db, username, password, email, []string{"user"})
+	err := registerUser(username, password, email, []string{"user"})
 	if err != nil {
 		logrus.Error("Ошибка при регистрации пользователя: ", err)
 		return c.Render("login",
