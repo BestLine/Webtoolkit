@@ -55,6 +55,7 @@ func setupProtectedRoutes(app *fiber.App) {
 	app.Get("/compare_release", getCompareRelease)
 	app.Post("/get_version_list", GetVersionsList)
 	app.Post("/get_host_list", GetHostList)
+	app.Post("/assignProjects", assignProjects)
 }
 
 var db *sql.DB
@@ -123,6 +124,6 @@ func main() {
 }
 
 //TODO:
-//поправить css на странице запуска тестов
 //довабить список генераторов
-//придумать вывод ошибок и ответов
+//сделать назначение пользователей на проекты
+//сделать страницу подписок

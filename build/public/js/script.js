@@ -115,41 +115,7 @@ function NavbarLeftHandler() {
 					updateDataPage(event, ev_type)
 				});
 			})
-		} else if (button_text === "Создать бакет") {
-			$( "#wrapper" ).load( "/create_bucket", function(responseText, textStatus) {
-				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
-				}
-				document.querySelector('.formWithValidation').addEventListener('submit', handleCreateBucket)
-			});
-		} else if (button_text === "Привязка корневой страницы конфлюенс") {
-			$( "#wrapper" ).load( "/set_report_homepage", function(responseText, textStatus) {
-				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
-				}
-				document.querySelector('.formWithValidation').addEventListener('submit', handleSetReportHomepage)
-			});
-		} else if (button_text === "Привязать методику") {
-			$( "#wrapper" ).load( "/set_methodic", function(responseText, textStatus) {
-				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
-				}
-				document.querySelector('.formWithValidation').addEventListener('submit', handleMetodicSet)
-				document.querySelector('.bucke').addEventListener("change", function(event) {
-					const ev_type = "projects"
-					updateDataPage(event, ev_type)
-				});
-			})
-		} else if (button_text === "Сравнение тестов") {
+		}  else if (button_text === "Сравнение тестов") {
 			$( "#wrapper" ).load( "/compare_release", function(responseText, textStatus) {
 				if (textStatus === "error") {
 					// В случае ошибки загрузки, выводим сообщение
@@ -304,6 +270,7 @@ function handleStartTest(event) {
 	xhr.open("POST", "http://172.17.155.33:9999/create", true);
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 	xhr.send(JSON.stringify(data));
+	//TODO: добавить параметризацию
 }
 
 function handleMetodicSet(event) {
@@ -311,55 +278,36 @@ function handleMetodicSet(event) {
 	let bucket = form.querySelector('.bucket');
 	let page = form.querySelector('.page');
 	let version = form.querySelector('.version');
-	let xhr = new XMLHttpRequest();
 	let data = {};
 	event.preventDefault();
 	let pageNumber = page.value.replace(/\D/g, ''); // Оставляет только цифры
 	page.value = pageNumber;
-
 	data["bucket"] = bucket.value;
 	data["version"] = version.value;
 	data["page"] = page.value;
 	console.log("JSON: ", JSON.stringify(data));
-
+	send_request_with_notification(data, "/beeload/add/methodic", "Статус: Методика привязана")
 	//TODO: Реализация
-
-	xhr.open("POST", "/beeload/add/methodic", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.send(JSON.stringify(data));
-	let msg = document.querySelector('.error_message')
-	msg.textContent = 'Статус: Методика привязана';
 }
 
 function handleVersionAdd(event) {
 	let form = document.querySelector('.settings_page')
 	let version = form.querySelector('#set_version')
-	let xhr = new XMLHttpRequest();
 	let data = {};
 	event.preventDefault()
 	data["version"] = version.value
 	console.log("JSON: ", JSON.stringify(data))
-	xhr.open("POST", "/beeload/add/version", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.send(JSON.stringify(data));
-	let msg = document.querySelector('.error_message')
-	msg.textContent = 'Статус: Новая версия создана'
+	send_request_with_notification(data, "/beeload/add/version", "Статус: Новая версия создана")
 }
 
 function handleConflPageAdd(event) {
 	let form = document.querySelector('.settings_page')
 	let page = form.querySelector('#confl_page_url')
-	let xhr = new XMLHttpRequest();
 	let data = {};
 	event.preventDefault()
 	data["page"] = page.value
 	console.log("JSON: ", JSON.stringify(data))
-	xhr.open("POST", "/beeload/add/confl_page", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.send(JSON.stringify(data));
-	let msg = document.querySelector('.error_message')
-	msg.textContent = 'Статус: Новая страница привязана'
-
+	send_request_with_notification(data, "/beeload/add/confl_page", "Статус: Новая страница привязана")
 }
 
 function handleSetReportHomepage(event) {
@@ -377,31 +325,6 @@ function handleSetReportHomepage(event) {
 	xhr.onreadystatechange = function (message) {
 		var responceMsg = document.querySelector('.error_message');
 		var anim_border = document.querySelector('.form_wrapper');
-		if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-			let response = this.responseText;
-			console.log(response);
-			responceMsg.textContent = response;
-			responceMsg.style.color = '#33cc33';
-			responceMsg.style.border = '3px solid #33cc33';
-			responceMsg.style.animation="errorAnim .2s forwards";
-			responceMsg.style.textAlign = 'center';
-			responceMsg.style.fontSize = '24px';
-			anim_border.style.border = '0px solid #33cc33';
-			anim_border.style.transition = 'border-width 0.5s';
-			anim_border.style.borderWidth = '5px';
-			anim_border.classList.add('animation');
-		} else if  (this.status !== 200) {
-			responceMsg.textContent = "[ERROR] Код ответа сервера: "+ this.status +this.responseText;
-			responceMsg.style.color = '#F65656';
-			responceMsg.style.textAlign = 'center';
-			responceMsg.style.fontSize = '24px';
-			anim_border.style.border = '0px solid #F65656';
-			anim_border.style.transition = 'border-width 0.5s';
-			anim_border.style.borderWidth = '5px';
-			anim_border.classList.add('animation');
-			responceMsg.style.border = '3px solid #F65656';
-			responceMsg.style.animation="errorAnim .2s forwards";
-		}
 	}
 	xhr.send(JSON.stringify(data));
 }
@@ -412,26 +335,27 @@ function setActiveProject(event) {
 	let msg = document.querySelector('.error_message')
 	let xhr = new XMLHttpRequest();
 	let data = {};
-	// Выполняем действие с выбранным значением, например, отправляем на сервер
-	// alert("Выбран проект: " + selectedValue);
-	// msg.textContent = "Выбран проект: "+ selectedValue
 	updateDataPage(event, "versions")
 	data["project_name"] = selectedValue
-	xhr.open("POST", "/beeload/set/project", true);
+	send_request_with_notification(data, "/beeload/set/project", "Выбран проект: " + selectedValue)
+}
+
+function send_request_with_notification(data, url, message) {
+	// В данный момент может только в пост
+	console.log("send_request_with_notification")
+	let xhr = new XMLHttpRequest();
+	let msg = document.querySelector('.error_message')
+	xhr.open("POST", url, true);
 	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 	xhr.addEventListener("load", function() {
 		if (xhr.status === 200) { // Коды ответов
-			msg.textContent = "Выбран проект: "+ selectedValue
-			// alert("Успешный запрос!");
+			msg.textContent = message
 		} else if (xhr.status === 404) {
 			msg.textContent = "Ресурс не найден: " + xhr.status
-			alert("Ресурс не найден.");
 		} else if (xhr.status === 500) {
 			msg.textContent = "Внутренняя ошибка сервера: " + xhr.status
-			// alert("Внутренняя ошибка сервера.");
 		} else {
 			msg.textContent = "Неизвестный код ответа: " + xhr.status
-			// alert("Неизвестный код ответа: " + xhr.status);
 		}
 	});
 	xhr.send(JSON.stringify(data));
@@ -442,17 +366,12 @@ function handleCreateBucket(event) {
 	let host =document.querySelector('#settings_host')
 	let bucket = document.querySelector('#new_bucket_name');
 	console.log("handleCreateBucket")
-	let xhr = new XMLHttpRequest();
 	let data = {};
 	event.preventDefault()
 	data["host"] = host.value
 	data["bucket"] = bucket.value
 	console.log("JSON: ", JSON.stringify(data))
-	xhr.open("POST", "/beeload/create/bucket", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.send(JSON.stringify(data));
-	let msg = document.querySelector('.error_message')
-	msg.textContent = "Статус: Новый бакет " + data["bucket"] + " создан"
+	send_request_with_notification(data, "/beeload/create/bucket", "Статус: Новый бакет " + data["bucket"] + " создан")
 }
 
 function handleCompare(event) {
@@ -460,7 +379,6 @@ function handleCompare(event) {
 	let bucket = form.querySelector('.bucket')
 	let StartTime = form.querySelector('.StartTime')
 	let EndTime = form.querySelector('.EndTime')
-	let xhr = new XMLHttpRequest();
 	let data = {};
 	event.preventDefault()
 	data["bucket"] = bucket.value
@@ -469,9 +387,7 @@ function handleCompare(event) {
 	data["start_timestamp"] = toTimestamp(StartTime.value)
 	data["end_timestamp"] = toTimestamp(EndTime.value)
 	console.log("JSON: ", JSON.stringify(data))
-	xhr.open("POST", "/test_make_compare", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.send(JSON.stringify(data));
+	send_request_with_notification(data, "/test_make_compare", "Статус: сравнение тест")
 }
 
 function checkTime() {
@@ -480,7 +396,6 @@ function checkTime() {
 	let endTimeInput = form.querySelector('.EndTime')
 	const startTime = new Date(startTimeInput.value);
 	const endTime = new Date(endTimeInput.value);
-
 	if (startTime > endTime) {
 		alert("Время начала не может быть больше времени завершения.");
 		startTimeInput.value = ""; // Очищаем поле времени начала
@@ -493,7 +408,6 @@ function handleMakeReport(event) {
 	let project = form.querySelector('.project')
 	let StartTime = form.querySelector('.StartTime')
 	let EndTime = form.querySelector('.EndTime')
-	let xhr = new XMLHttpRequest();
 	let data = {};
 	event.preventDefault()
 	StartTime.classList.add("invalid")
@@ -502,18 +416,7 @@ function handleMakeReport(event) {
 	data["EndTime"] = EndTime.value
 	data["StartTime"] = StartTime.value
 	console.log("JSON: ", JSON.stringify(data))
-	xhr.open("POST", "/beeload/make/report", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.onreadystatechange = function (message) {
-		var responceMsg = document.querySelector('.error_message');
-		var anim_border = document.querySelector('.form_wrapper');
-		if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-
-		} else if  (this.status !== 200) {
-
-		}
-	}
-	xhr.send(JSON.stringify(data));
+	send_request_with_notification(data, "/beeload/make/report", "Статус: Генерация отчёта запрошена.")
 }
 
 function toTimestamp(strDate){

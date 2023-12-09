@@ -311,7 +311,7 @@ func RespToByteReader(response *http.Response) []byte {
 func select_all_users() string {
 	logrus.Debug("select_all_users")
 	users, _ := GetAllUsers()
-	res := "<select name=\"user\" required><option value=\"\" disabled selected>Выберите пользователя</option>"
+	res := "<select name=\"user\" class=\"user\" required><option value=\"\" disabled selected>Выберите пользователя</option>"
 	for _, userName := range users {
 		res += "<option value=\"" + userName + "\">" + userName + "</option>"
 	}

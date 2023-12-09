@@ -40,7 +40,7 @@ func createSQLiteDB() error {
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS roles (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			name TEXT NOT NULL
+			name TEXT NOT NULL UNIQUE
 		)
 	`)
 
@@ -105,20 +105,35 @@ func createSQLiteDB() error {
 	`)
 
 	_, err = db.Exec(`
-    INSERT OR IGNORE INTO users (username, password) VALUES ('admin', '123')
-`)
+		CREATE TABLE IF NOT EXISTS user_subscriptions (
+		    user_id INTEGER NOT NULL,
+		    project_id INTEGER NOT NULL,
+		    FOREIGN KEY (user_id) REFERENCES users(user_id),
+		    FOREIGN KEY (project_id) REFERENCES projects(project_id),
+		    PRIMARY KEY (user_id, project_id)
+		)
+	`)
 
-	_, err = db.Exec(`
-    INSERT OR IGNORE INTO roles (name) VALUES ('admin')
-`)
+	var count int
+	err = db.QueryRow("SELECT COUNT(*) FROM users WHERE username = 'admin'").Scan(&count)
+	if count == 0 {
+		_, err = db.Exec(`
+    		INSERT OR IGNORE INTO users (username, password) VALUES ('admin', '123')
+		`)
 
-	_, err = db.Exec(`
-    INSERT OR IGNORE INTO user_roles (user_id, role_id)
-    VALUES (
-        (SELECT id FROM users WHERE username = 'admin'),
-        (SELECT id FROM roles WHERE name = 'admin')
-    )
-`)
+		_, err = db.Exec(`
+    		INSERT OR IGNORE INTO roles (name) VALUES ('admin')
+		`)
+
+		_, err = db.Exec(`
+    		INSERT OR IGNORE INTO user_roles (user_id, role_id)
+    		VALUES (
+        		(SELECT id FROM users WHERE username = 'admin'),
+        		(SELECT id FROM roles WHERE name = 'admin')
+    		)
+		`)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -447,4 +462,11 @@ func AddProjectRootPage(PageId int, ProjectName string) error {
 	}
 	return nil
 	//TODO: new feature
+}
+
+func AddUserSubscriptions(UserName, Projects) error {
+	for _, project := range Projects {
+		Query := "INSERT OR IGNORE INTO user_subscriptions"
+	}
+	return nil
 }

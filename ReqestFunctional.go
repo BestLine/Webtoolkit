@@ -253,3 +253,13 @@ func setActiveUserProject(c *fiber.Ctx) error {
 	//projectsList, _ := GetUserProjects(db, username)
 	return c.SendString("OK")
 }
+
+func assignProjects(c *fiber.Ctx) error {
+	logrus.Debug("assignProjects")
+	username := c.FormValue("user")
+	projectNames := strings.Split(c.FormValue("projects"), ",")
+	//projectNames := c.FormValue("projects")
+	fmt.Printf("Username: %s\n", username)
+	fmt.Printf("Projects: %v\n", projectNames)
+	return c.SendStatus(fiber.StatusOK)
+}
