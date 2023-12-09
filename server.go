@@ -36,6 +36,7 @@ func setupProtectedRoutes(app *fiber.App) {
 	app.Post("/beeload/add/version", addVersion)
 	app.Post("/beeload/add/project", addProject)
 	app.Post("/beeload/add/confl_page", addConflPage)
+	app.Post("/beeload/add/user_to_project", addUserToProject)
 	app.Get("/", startPage)
 	app.Get("/main_page", getMainPage)
 	app.Get("/compare", getCompare)
@@ -126,4 +127,4 @@ func main() {
 //TODO:
 //довабить список генераторов
 //сделать назначение пользователей на проекты
-//сделать страницу подписок
+//TODO: необходимо добавить синхронизацию подписок с беком assignProjects

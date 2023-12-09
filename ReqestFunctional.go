@@ -59,7 +59,7 @@ func addMethodic(c *fiber.Ctx) error {
 		return err
 	}
 	page, err := strconv.Atoi(methodic.Page)
-	AddProjectMethodic(page, methodic.Version, activeProject)
+	err = AddProjectMethodic(page, methodic.Version, activeProject)
 	if err != nil {
 		logrus.Error("addMethodic ERROR: ", err)
 		return err
@@ -218,12 +218,27 @@ func addConflPage(c *fiber.Ctx) error {
 	}
 	activeProject, err := GetUserActiveProject(username)
 	int_page, err := strconv.Atoi(page.Page)
-	AddProjectRootPage(int_page, activeProject)
+	err = AddProjectRootPage(int_page, activeProject)
 	if err != nil {
 		logrus.Error("addConflPage ERROR: ", err)
 		return err
 	}
 	return c.JSON("OK")
+}
+
+func addUserToProject(c *fiber.Ctx) error {
+	logrus.Debug("addUserToProject")
+	logrus.Debug("raw = ", string(c.Body()))
+	userProject := new(UserProject)
+	if err := c.BodyParser(userProject); err != nil {
+		logrus.Error(err)
+		return err
+	}
+	err := AddUserToProject(userProject.User, userProject.Project)
+	if err != nil {
+		return err
+	}
+	return c.SendStatus(fiber.StatusOK)
 }
 
 func setActiveUserProject(c *fiber.Ctx) error {
@@ -258,8 +273,13 @@ func assignProjects(c *fiber.Ctx) error {
 	logrus.Debug("assignProjects")
 	username := c.FormValue("user")
 	projectNames := strings.Split(c.FormValue("projects"), ",")
-	//projectNames := c.FormValue("projects")
 	fmt.Printf("Username: %s\n", username)
 	fmt.Printf("Projects: %v\n", projectNames)
+	err := AddUserSubscriptions(username, projectNames)
+	if err != nil {
+		logrus.Error("assignProjects ERROR: ", err)
+		return err
+	}
+	//TODO: необходимо добавить синхронизацию подписок с беком
 	return c.SendStatus(fiber.StatusOK)
 }

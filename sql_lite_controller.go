@@ -108,8 +108,8 @@ func createSQLiteDB() error {
 		CREATE TABLE IF NOT EXISTS user_subscriptions (
 		    user_id INTEGER NOT NULL,
 		    project_id INTEGER NOT NULL,
-		    FOREIGN KEY (user_id) REFERENCES users(user_id),
-		    FOREIGN KEY (project_id) REFERENCES projects(project_id),
+		    FOREIGN KEY (user_id) REFERENCES users(id),
+		    FOREIGN KEY (project_id) REFERENCES projects(id),
 		    PRIMARY KEY (user_id, project_id)
 		)
 	`)
@@ -464,9 +464,38 @@ func AddProjectRootPage(PageId int, ProjectName string) error {
 	//TODO: new feature
 }
 
-func AddUserSubscriptions(UserName, Projects) error {
+func AddUserSubscriptions(UserName string, Projects []string) error {
+	Query := `DELETE FROM user_subscriptions
+		WHERE user_id = (SELECT user_id FROM users WHERE username = ?)
+	`
+	_, err := db.Exec(Query, UserName)
 	for _, project := range Projects {
-		Query := "INSERT OR IGNORE INTO user_subscriptions"
+		Query = `INSERT OR IGNORE INTO user_subscriptions (user_id, project_id)
+    		SELECT users.id, projects.id
+    		FROM users, projects
+    		WHERE users.username = ? AND projects.project_name = ?
+		`
+		_, err = db.Exec(Query, UserName, project)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func AddUserToProject(UserName string, Project string) error {
+	logrus.Debug("AddUserToProject")
+	logrus.Debug("UserName: ", UserName)
+	logrus.Debug("Project: ", Project)
+	Query := `INSERT INTO user_projects (user_id, project_id, active)
+		SELECT users.id, projects.id, 0
+		FROM users, projects
+		WHERE users.username = ? AND projects.project_name = ?
+	`
+	_, err := db.Exec(Query, UserName, Project)
+	if err != nil {
+		logrus.Error(err)
+		return err
 	}
 	return nil
 }

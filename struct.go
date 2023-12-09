@@ -11,6 +11,11 @@ type Project struct {
 	Name string `json:"project_name"`
 }
 
+type UserProject struct {
+	User    string `json:"user"`
+	Project string `json:"project"`
+}
+
 type NewBucket struct {
 	Host   string `json:"host"`
 	Bucket string `json:"bucket"`
