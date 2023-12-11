@@ -114,7 +114,7 @@ func getAdminPanel(c *fiber.Ctx) error {
 func getStartTest(c *fiber.Ctx) error {
 	logrus.Debug("getStartTest")
 	return c.Render("start_test",
-		fiber.Map{"Buckets": add_tags(get_bucket_list(c))})
+		fiber.Map{"GeneratorsList": make_generators_list()})
 }
 
 func getSettings(c *fiber.Ctx) error {

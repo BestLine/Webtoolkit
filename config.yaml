@@ -6,3 +6,4 @@ server:
   log_filename: "./frontend.log"
 backend:
   host: "http://127.0.0.1:7778"
+  test_starter: "http://172.17.155.33:9999"

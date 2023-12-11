@@ -356,3 +356,14 @@ func make_user_project_list() string {
 	res += "</select>"
 	return res
 }
+
+func make_generators_list() string {
+	logrus.Debug("make_generators_list")
+	res := "<select name=\"generator\" class=\"genType\" required><option value=\"\" disabled selected>Выберите Генератор</option>"
+	generators := "<option value=\"4ram2cpu\">4ram2cpu</option>" +
+		"<option value=\"8ram4cpu\">8ram4cpu</option>" +
+		"<option value=\"16ram8cpu\">16ram8cpu</option>"
+	res += generators
+	res += "</select>"
+	return res
+}

@@ -37,6 +37,7 @@ func setupProtectedRoutes(app *fiber.App) {
 	app.Post("/beeload/add/project", addProject)
 	app.Post("/beeload/add/confl_page", addConflPage)
 	app.Post("/beeload/add/user_to_project", addUserToProject)
+	app.Post("/beeload/test/create", testCreate)
 	app.Get("/", startPage)
 	app.Get("/main_page", getMainPage)
 	app.Get("/compare", getCompare)

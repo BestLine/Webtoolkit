@@ -5,6 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"strconv"
 	"strings"
 )
@@ -281,5 +282,13 @@ func assignProjects(c *fiber.Ctx) error {
 		return err
 	}
 	//TODO: необходимо добавить синхронизацию подписок с беком
+	return c.SendStatus(fiber.StatusOK)
+}
+
+func testCreate(c *fiber.Ctx) error {
+	logrus.Debug("testCreate")
+	url := viper.GetString("backend.test_starter") + "/create"
+	//logrus.Debug(string(c.Body())
+	sendRequest(c, "Post", url, string(c.Body()))
 	return c.SendStatus(fiber.StatusOK)
 }

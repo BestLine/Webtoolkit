@@ -260,17 +260,15 @@ function handleCompareRelease(event) {
 function handleStartTest(event) {
 	let form = document.querySelector('.formWithValidation')
 	let git_url = form.querySelector('.gitUrl')
-	let xhr = new XMLHttpRequest();
+	let count = form.querySelector('.genCount')
+	let gen_type = form.querySelector('.genType')
 	let data = {};
 	event.preventDefault()
 	data["gitlab"] = git_url.value
-	data["count"] = 1
-	data["resource"] = "2cpu4ram"
+	data["count"] = count.value
+	data["resource"] = gen_type.value
 	console.log("JSON: ", JSON.stringify(data))
-	xhr.open("POST", "http://172.17.155.33:9999/create", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.send(JSON.stringify(data));
-	//TODO: добавить параметризацию
+	send_request_with_notification(data, "/beeload/test/create", "Статус: Запрос на запуск теста отправлен")
 }
 
 function handleMetodicSet(event) {
