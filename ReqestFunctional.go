@@ -292,3 +292,12 @@ func testCreate(c *fiber.Ctx) error {
 	sendRequest(c, "Post", url, string(c.Body()))
 	return c.SendStatus(fiber.StatusOK)
 }
+
+func getSyncBuckets(c *fiber.Ctx) error {
+	logrus.Debug("getSyncBuckets")
+	url := "/bucket"
+	res := sendRequest(c, "GET", url)
+	fmt.Println(string(res))
+	logrus.Debug(string(res))
+	return c.SendStatus(fiber.StatusOK)
+}

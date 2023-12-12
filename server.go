@@ -7,9 +7,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/template/html"
+	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"html/template"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -52,6 +54,7 @@ func setupProtectedRoutes(app *fiber.App) {
 	app.Get("/start_test", getStartTest)
 	app.Get("/adminPanel", getAdminPanel)
 	app.Get("/adminPanel/subscription", getAdminSubscription)
+	app.Get("/bucket/sync", getSyncBuckets)
 	app.Post("/get_project_buckets", GetProjectBuckets)
 	app.Post("/get_bucket_projects", GetBucketProjects)
 	app.Get("/compare_release", getCompareRelease)
@@ -100,6 +103,27 @@ func main() {
 		return
 	}
 
+	// Запуск переодической синхронизации
+	c := cron.New()
+	_, _ = c.AddFunc(viper.GetString("server.sync_period"), func() {
+		logrus.Debug("SyncBuckets")
+		url := "/bucket"
+		targetURL := viper.GetString("backend.host") + url
+		res, err := http.Get(targetURL)
+		if err != nil {
+			logrus.Error(err)
+		}
+		defer res.Body.Close()
+		if res.StatusCode != 200 {
+			logrus.Error("SyncRequest responce code: ", res.StatusCode)
+		}
+		res2 := RespToByteReader(res)
+		fmt.Println("Ответ: ", string(res2))
+		logrus.Debug("Ответ: ", string(res2))
+		fmt.Println("Выполнена периодическая синхронизация.")
+	})
+	c.Start()
+
 	// Запуск сервера в горутине
 	go func() {
 		port := viper.GetInt("server.port")
@@ -126,6 +150,4 @@ func main() {
 }
 
 //TODO:
-//довабить список генераторов
-//сделать назначение пользователей на проекты
 //TODO: необходимо добавить синхронизацию подписок с беком assignProjects

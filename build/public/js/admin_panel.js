@@ -30,6 +30,28 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     });
 
+    document.getElementById('syncProjectsBtn').addEventListener('click', function() {
+        console.log('Синхронизация списка проектов');
+        let xhr = new XMLHttpRequest();
+        let msg = document.querySelector('.error_message')
+        let url = "/bucket/sync"
+        let message = "Синхронизация прошла успешно"
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        xhr.addEventListener("load", function() {
+            if (xhr.status === 200) { // Коды ответов
+                msg.textContent = message
+            } else if (xhr.status === 404) {
+                msg.textContent = "Ресурс не найден: " + xhr.status
+            } else if (xhr.status === 500) {
+                msg.textContent = "Внутренняя ошибка сервера: " + xhr.status
+            } else {
+                msg.textContent = "Неизвестный код ответа: " + xhr.status
+            }
+        });
+        xhr.send();
+    });
+
     form_add_user_to_project.addEventListener("submit", function(event) {
         event.preventDefault();
         form_add_user_to_project.action = "/beeload/add/user_to_project";
