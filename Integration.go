@@ -29,7 +29,7 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 		}
 		fmt.Printf("Type: %T, Value: %v\n", arg, arg)
 	}
-	targetURL := viper.GetString("backend.host") + strArgs[1]
+	targetURL := viper.GetString("backend.pure_host") + strArgs[1]
 	if strArgs[0] == "Get" {
 		response, err = http.Get(targetURL)
 	} else if strArgs[0] == "Post" {

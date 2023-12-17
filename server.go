@@ -11,7 +11,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"html/template"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -106,20 +105,9 @@ func main() {
 	// Запуск переодической синхронизации
 	c := cron.New()
 	_, _ = c.AddFunc(viper.GetString("server.sync_period"), func() {
-		logrus.Debug("SyncBuckets")
-		url := "/bucket"
-		targetURL := viper.GetString("backend.host") + url
-		res, err := http.Get(targetURL)
-		if err != nil {
-			logrus.Error(err)
-		}
-		defer res.Body.Close()
-		if res.StatusCode != 200 {
-			logrus.Error("SyncRequest responce code: ", res.StatusCode)
-		}
-		res2 := RespToByteReader(res)
-		fmt.Println("Ответ: ", string(res2))
-		logrus.Debug("Ответ: ", string(res2))
+		logrus.Debug("CRON STARTED!")
+		syncBuckets() // синхронизация бакетов с беком
+		logrus.Debug("CRON FINISHED!")
 		fmt.Println("Выполнена периодическая синхронизация.")
 	})
 	c.Start()

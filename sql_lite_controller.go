@@ -9,14 +9,12 @@ import (
 
 func DBInit() {
 	var err error
-
-	// Инициализация пула подключений к SQLite3
+	// Инициализация пула
 	db, err = sql.Open("sqlite", "./mydatabase.db")
 	if err != nil {
 		fmt.Println("Error opening database:", err)
 		return
 	}
-	//defer db.Close()
 
 	// Установка максимального числа открытых соединений в пуле
 	db.SetMaxOpenConns(20)
@@ -496,6 +494,19 @@ func AddUserToProject(UserName string, Project string) error {
 	if err != nil {
 		logrus.Error(err)
 		return err
+	}
+	return nil
+}
+
+func SyncProjects(Projects []string) error {
+	Query := `DELETE FROM projects`
+	_, err := db.Exec(Query)
+	for _, project := range Projects {
+		Query = `INSERT OR IGNORE INTO projects (project_name) VALUES (?)`
+		_, err = db.Exec(Query, project)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

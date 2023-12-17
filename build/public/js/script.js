@@ -31,8 +31,11 @@ function test(){
 				document.querySelector('.EndTime').addEventListener('change', checkTime)
 				document.querySelector('.StartTime').addEventListener('change', checkTime)
 				document.querySelector('.proj').addEventListener("change", function(event) {
-					const ev_type = "bucket"
+					// const ev_type = "bucket"
+					const ev_type = "projects"
+					console.log("UPDATE : ", ev_type)
 					updateDataPage(event, ev_type)
+					//TODO: добавить обработку списка тестов
 				});
 			})
 		} else if (e.target.textContent === "Управление тестами") {
@@ -211,10 +214,10 @@ function updateDataPage(event, ev_type) {
 		select = $('#settings_version_list')
 	} else if (ev_type === "projects") {
 		console.log(`update projects!`)
-		data["project"] = document.querySelector('#bucket_options').value
-		console.log(`project: `, data["project"])
+		data["project"] = document.querySelector('#project_options').value
+		console.log(`Project options: `, data["project"])
 		url = "/get_bucket_projects"
-		select = $('#project_options')
+		select = $('#test_options')
 	} else if (ev_type === "hosts") {
 		console.log(`update hosts!`)
 		url = "/get_host_list"
@@ -296,6 +299,7 @@ function handleVersionAdd(event) {
 	data["version"] = version.value
 	console.log("JSON: ", JSON.stringify(data))
 	send_request_with_notification(data, "/beeload/add/version", "Статус: Новая версия создана")
+	updateDataPage(event, "versions")
 }
 
 function handleConflPageAdd(event) {
@@ -402,14 +406,14 @@ function checkTime() {
 
 function handleMakeReport(event) {
 	let form = document.querySelector('.formWithValidation')
-	let bucket = form.querySelector('#bucket_options')
-	let project = form.querySelector('.project')
+	let project = form.querySelector('#project_options')
+	let test = form.querySelector('#test_options')
 	let StartTime = form.querySelector('.StartTime')
 	let EndTime = form.querySelector('.EndTime')
 	let data = {};
 	event.preventDefault()
 	StartTime.classList.add("invalid")
-	data["application"] = bucket.value
+	data["application"] = test.value
 	data["bucket"] = project.value
 	data["EndTime"] = EndTime.value
 	data["StartTime"] = StartTime.value

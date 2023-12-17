@@ -28,15 +28,17 @@
         <div class="option">
             <p class="area_label">Привязка методики</p>
             <input class="page" type="number" id="set_methodic_page" placeholder="Введите адрес страницы" required>
-            <select class='version field' id="settings_version_list">
+            <select required class='version field' id="settings_version_list">
                 {{ unescape .Versions}}
             </select>
             <button class="l_btn" id="btn_set_methodic" formaction="submit">Привязать методику</button>
         </div>
         <div class="option">
             <p class="area_label">Добавление версии</p>
-            <input type="text" id="set_version" placeholder="Введите новую версию" required>
-            <button class="l_btn" id="btn_set_version" formaction="submit">Создать новую версию</button>
+            <form class="adm_c_project" action="/submit" method="post">
+                <input type="text" id="set_version" placeholder="Введите новую версию" required>
+                <button class="l_btn" id="btn_set_version" type="submit">Создать новую версию</button>
+            </form>
         </div>
 
     </div>

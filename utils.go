@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"io"
 	"net/http"
 	"strconv"
@@ -252,6 +253,8 @@ func get_project_buckets(c *fiber.Ctx, project string) []string {
 		fmt.Println("Error:", err)
 		return nil
 	}
+	//TODO: возвращает список всех тестов
+	//TODO: добавить в форму создания отчёта
 	return dataToListOfStrings(data, "Bucket")
 }
 
@@ -366,4 +369,37 @@ func make_generators_list() string {
 	res += generators
 	res += "</select>"
 	return res
+}
+
+func syncBuckets() string {
+	logrus.Debug("syncBuckets")
+	url := "/bucket"
+	targetURL := viper.GetString("backend.pure_host") + url
+	res, err := http.Get(targetURL)
+	if err != nil {
+		logrus.Error("syncBuckets Error:", err)
+		return ""
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		logrus.Error("SyncRequest ", targetURL, " code: ", res.StatusCode)
+	}
+	var responseStruct struct {
+		Bucket []string `json:"bucket"`
+	}
+	err = json.Unmarshal(RespToByteReader(res), &responseStruct)
+	if err != nil {
+		fmt.Println("Error decoding JSON:", err)
+		return ""
+	}
+	stringArray := responseStruct.Bucket
+	fmt.Println("Array of Strings:", stringArray)
+	err = SyncProjects(stringArray)
+	if err != nil {
+		fmt.Println("Error SyncProjectsSQL:", err)
+		return ""
+	}
+	fmt.Println("syncBuckets Ответ: ", stringArray)
+	logrus.Debug("syncBuckets Ответ: ", stringArray)
+	return ""
 }

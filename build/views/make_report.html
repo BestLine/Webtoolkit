@@ -21,15 +21,15 @@
                         </span>
                     </div>
                     <div class="input_field select_option proj">
-                        <p class="area_label">Выберите application</p>
-                        <select>
+                        <p class="area_label">Выберите проект</p>
+                        <select class="project field" id="project_options">
                             {{ unescape .Projects}}
                         </select>
                         <div class="select_arrow"></div>
                     </div>
                     <div class="input_field select_option bucket">
-                        <p class="area_label">Выберите бакет</p>
-                        <select class='bucket field' id="bucket_options" required>
+                        <p class="area_label">Выберите тест</p>
+                        <select class='bucket field' id="test_options" required>
                             {{ unescape .Buckets}}
                         </select>
                         <div class="select_arrow"></div>

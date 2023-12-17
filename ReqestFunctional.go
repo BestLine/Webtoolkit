@@ -295,9 +295,8 @@ func testCreate(c *fiber.Ctx) error {
 
 func getSyncBuckets(c *fiber.Ctx) error {
 	logrus.Debug("getSyncBuckets")
-	url := "/bucket"
-	res := sendRequest(c, "GET", url)
-	fmt.Println(string(res))
-	logrus.Debug(string(res))
+	res := syncBuckets()
+	fmt.Println(res)
+	logrus.Debug(res)
 	return c.SendStatus(fiber.StatusOK)
 }
