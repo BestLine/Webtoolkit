@@ -499,14 +499,85 @@ func AddUserToProject(UserName string, Project string) error {
 }
 
 func SyncProjects(Projects []string) error {
-	Query := `DELETE FROM projects`
-	_, err := db.Exec(Query)
-	for _, project := range Projects {
-		Query = `INSERT OR IGNORE INTO projects (project_name) VALUES (?)`
-		_, err = db.Exec(Query, project)
+	logrus.Debug("func SyncProjects started!")
+	// Start transaction
+	tx, err := db.Begin()
+	if err != nil {
+		logrus.Debug("Transaction error: ", err)
+		return err
+	}
+	defer func() {
 		if err != nil {
+			logrus.Debug("ROLLBACK execution reason: ", err)
+			tx.Rollback()
+		} else {
+			logrus.Debug("COMMIT execution")
+			tx.Commit()
+		}
+	}()
+
+	deleteQuery := `DELETE FROM projects WHERE project_name NOT IN (?)`
+	deleteArgs := make([]interface{}, len(Projects))
+	for i, project := range Projects {
+		deleteArgs[i] = project
+	}
+	_, err = tx.Exec(deleteQuery, deleteArgs...)
+	if err != nil {
+		logrus.Debug("SQL Execution error: ", err)
+		return err
+	}
+
+	insertQuery := `INSERT OR IGNORE INTO projects (project_name) VALUES (?)`
+	for _, project := range Projects {
+		_, err = tx.Exec(insertQuery, project)
+		if err != nil {
+			logrus.Debug("SQL Insert error: ", err)
 			return err
 		}
 	}
+	return nil
+}
+
+func test1(Projects []string) error {
+	logrus.Debug("test1")
+	// Start a transaction
+	tx, err := db.Begin()
+	if err != nil {
+		logrus.Debug("test1: ", err)
+		return err
+	}
+	defer func() {
+		// Rollback the transaction if an error occurs, otherwise commit
+		if err != nil {
+			logrus.Debug("test2: ", err)
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+
+	// Delete unnecessary projects
+	deleteQuery := `DELETE FROM projects WHERE project_name NOT IN (?)`
+	deleteArgs := make([]interface{}, len(Projects))
+	for i, project := range Projects {
+		deleteArgs[i] = project
+	}
+	_, err = tx.Exec(deleteQuery, deleteArgs...)
+	//_, err = tx.Exec(deleteQuery, Projects)
+	if err != nil {
+		logrus.Debug("test3: ", err)
+		return err
+	}
+
+	// Insert new projects (ignoring duplicates)
+	insertQuery := `INSERT OR IGNORE INTO projects (project_name) VALUES (?)`
+	for _, project := range Projects {
+		_, err = tx.Exec(insertQuery, project)
+		if err != nil {
+			logrus.Debug("test4: ", err)
+			return err
+		}
+	}
+
 	return nil
 }

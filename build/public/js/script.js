@@ -32,9 +32,12 @@ function test(){
 				document.querySelector('.StartTime').addEventListener('change', checkTime)
 				document.querySelector('.proj').addEventListener("change", function(event) {
 					// const ev_type = "bucket"
-					const ev_type = "projects"
+					const ev_type = "test"
 					console.log("UPDATE : ", ev_type)
 					updateDataPage(event, ev_type)
+					//TODO: добавить обработку списка тестов
+					//TODO: добавить обработку списка тестов
+					//TODO: добавить обработку списка тестов
 					//TODO: добавить обработку списка тестов
 				});
 			})
@@ -114,7 +117,7 @@ function NavbarLeftHandler() {
 				}
 				document.querySelector('.formWithValidation').addEventListener('submit', handleMakeReport)
 				document.querySelector('.proj').addEventListener("change", function(event) {
-					const ev_type = "bucket"
+					const ev_type = "projects"
 					updateDataPage(event, ev_type)
 				});
 			})
@@ -201,11 +204,17 @@ function updateDataPage(event, ev_type) {
 	if (ev_type === "bucket") {
 		console.log(`update bucket!`)
 		data["project"] = document.querySelector('#project_options').value
-		data["StartTime"] = document.querySelector('.StartTime').value
-		data["EndTime"] = document.querySelector('.EndTime').value
+		// data["StartTime"] = document.querySelector('.StartTime').value
+		// data["EndTime"] = document.querySelector('.EndTime').value
 		console.log(`project: `, data["project"])
 		url = "/get_project_buckets"
 		select = $('#bucket_options')
+	} else if (ev_type === "test"){
+		console.log(`update test!`)
+		data["project"] = document.querySelector('#project_options').value
+		console.log(`project: `, data["project"])
+		url = "/get_project_buckets"
+		select = $('#test_options')
 	} else if (ev_type === "versions") {
 		console.log(`update versions!`)
 		data["project"] = document.querySelector('#settings_activeproject').value

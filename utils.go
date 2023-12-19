@@ -374,6 +374,8 @@ func make_generators_list() string {
 func syncBuckets() string {
 	logrus.Debug("syncBuckets")
 	url := "/bucket"
+	//projects := []string{"Project1", "Project3", "Project4", "Project5", "Project5", "Project5", "Project6", "Project7", "Project8"}
+	//err := test1(projects)
 	targetURL := viper.GetString("backend.pure_host") + url
 	res, err := http.Get(targetURL)
 	if err != nil {

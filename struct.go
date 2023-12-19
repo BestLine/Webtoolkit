@@ -8,7 +8,7 @@ type Role struct {
 }
 
 type Project struct {
-	Name string `json:"project_name"`
+	Name string `json:"project"`
 }
 
 type UserProject struct {

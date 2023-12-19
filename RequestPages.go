@@ -85,18 +85,31 @@ func getCompareRelease(c *fiber.Ctx) error {
 }
 
 func getMakeReport(c *fiber.Ctx) error {
+	//TODO: ЧИНИМ НАХУЙ
+	//TODO: ЧИНИМ НАХУЙ
+	//TODO: ЧИНИМ НАХУЙ
+	//TODO: ЧИНИМ НАХУЙ
 	logrus.Debug("getMakeReport")
 	value := c.Locals("user")
 	claims, _ := (value).(*jwt.MapClaims)
 	username, _ := (*claims)["username"].(string)
 	activeProject, _ := GetUserActiveProject(username)
 	projectsList, _ := GetUserProjects(username)
-	return c.Render("make_report",
-		fiber.Map{"Buckets": `<option style=" display: none;">Выберите хост</option>`,
-			"Projects": make_settings_projects_list(activeProject, projectsList)})
-	//	return c.Render("make_report",
-	//fiber.Map{"Buckets": `<option style=" display: none;">Выберите хост</option>`,
-	//	"Projects": select_all_projects()})
+	isAdmin, _ := hasUserRole(username, "admin")
+	fmt.Println("getMakeReport username ", username)
+	fmt.Println("getMakeReport activeProject ", activeProject)
+	fmt.Println("getMakeReport projectsList ", projectsList)
+	if isAdmin {
+		projectsList, _ = GetAllProjects()
+		activeProject = "Выберите проект"
+		return c.Render("make_report",
+			fiber.Map{"Buckets": `<option style=" display: none;">Выберите проект</option>`,
+				"Projects": make_settings_projects_list(activeProject, projectsList)})
+	} else {
+		return c.Render("make_report",
+			fiber.Map{"Buckets": `<option style=" display: none;">Выберите проект</option>`,
+				"Projects": make_settings_projects_list(activeProject, projectsList)})
+	}
 }
 
 func getCreateBucket(c *fiber.Ctx) error {
