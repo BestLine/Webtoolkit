@@ -248,7 +248,8 @@ func get_project_buckets(c *fiber.Ctx, project string) []string {
 	res := sendRequest(c, "Get", url)
 	logrus.Debug("URL: ", url)
 	var data []map[string]string
-	err := json.Unmarshal([]byte(res), &data)
+	err := json.Unmarshal(res, &data)
+	fmt.Println(string(res))
 	if err != nil {
 		fmt.Println("Error:", err)
 		return nil
@@ -363,9 +364,9 @@ func make_user_project_list() string {
 func make_generators_list() string {
 	logrus.Debug("make_generators_list")
 	res := "<select name=\"generator\" class=\"genType\" required><option value=\"\" disabled selected>Выберите Генератор</option>"
-	generators := "<option value=\"4ram2cpu\">4ram2cpu</option>" +
-		"<option value=\"8ram4cpu\">8ram4cpu</option>" +
-		"<option value=\"16ram8cpu\">16ram8cpu</option>"
+	generators := "<option value=\"ram4cpu2\">ram4cpu2</option>" +
+		"<option value=\"ram8cpu4\">ram8cpu4</option>" +
+		"<option value=\"ram16cpu8\">ram16cpu8</option>"
 	res += generators
 	res += "</select>"
 	return res

@@ -28,6 +28,7 @@ func GetProjectBuckets(c *fiber.Ctx) error {
 	logrus.Debug("getProjectBuckets")
 	project := new(Project)
 	if err := c.BodyParser(project); err != nil {
+		logrus.Error("getProjectBuckets Parsing error: ", err)
 		return err
 	}
 	return c.JSON(get_project_buckets(c, project.Name))

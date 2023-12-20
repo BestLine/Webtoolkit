@@ -55,6 +55,7 @@ func setupProtectedRoutes(app *fiber.App) {
 	app.Get("/adminPanel/subscription", getAdminSubscription)
 	app.Get("/bucket/sync", getSyncBuckets)
 	app.Post("/get_project_buckets", GetProjectBuckets)
+	app.Post("/get_list_of_tests", GetListOfTests)
 	app.Post("/get_bucket_projects", GetBucketProjects)
 	app.Get("/compare_release", getCompareRelease)
 	app.Post("/get_version_list", GetVersionsList)
@@ -137,5 +138,8 @@ func main() {
 	}
 }
 
-//TODO:
+//TODO: доделать проверку полей при создании отчёта
 //TODO: необходимо добавить синхронизацию подписок с беком assignProjects
+//TODO: сделать проверку заполнения полей на странице настроек
+//TODO:
+//TODO:

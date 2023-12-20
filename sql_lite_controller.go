@@ -569,7 +569,7 @@ func test1(Projects []string) error {
 		return err
 	}
 
-	// Insert new projects (ignoring duplicates)
+	// Insert new projects
 	insertQuery := `INSERT OR IGNORE INTO projects (project_name) VALUES (?)`
 	for _, project := range Projects {
 		_, err = tx.Exec(insertQuery, project)

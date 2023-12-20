@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -19,31 +18,47 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 	var response *http.Response
 	var err error
 	var body map[string]interface{}
+	var byte_body []byte
 
 	for _, arg := range args {
 		switch v := arg.(type) {
 		case map[string]interface{}:
 			body = v
+		case []byte:
+			byte_body = v
 		case string:
 			strArgs = append(strArgs, v)
 		}
-		fmt.Printf("Type: %T, Value: %v\n", arg, arg)
+		//fmt.Printf("Type: %T, Value: %v\n", arg, arg)
 	}
 	targetURL := viper.GetString("backend.pure_host") + strArgs[1]
 	if strArgs[0] == "Get" {
 		response, err = http.Get(targetURL)
+		if err != nil {
+			logrus.Error("Get sending error: ", err)
+			c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+			return nil
+		}
 	} else if strArgs[0] == "Post" {
-		logrus.Debug("body: ", body)
+		logrus.Debug("sendRequest body: ", body)
 		jsonBody, err := json.Marshal(body)
 		if err != nil {
-			logrus.Error(err)
+			logrus.Error("Post sending error: ", err)
 			c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
 			return nil
 		}
 		response, err = http.Post(targetURL, "application/json", bytes.NewBuffer(jsonBody))
+	} else if strArgs[0] == "Post2" {
+		logrus.Debug("sendRequest body: ", string(byte_body))
+		if err != nil {
+			logrus.Error("Post sending error: ", err)
+			c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+			return nil
+		}
+		response, err = http.Post(targetURL, "application/json", bytes.NewBuffer(byte_body))
 	}
 	if err != nil {
-		logrus.Error(err)
+		logrus.Error("sendRequest unknown error: ", err)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
 		return nil
 	}
@@ -54,9 +69,8 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
 		return nil
 	}
-	logrus.Debug("targetURL: ", targetURL)
-	logrus.Debug("response: ", response)
-	//fmt.Println("resp code: ", response.StatusCode)
+	logrus.Debug("sendRequest targetURL: ", targetURL)
+	logrus.Debug("sendRequest response: ", response)
 	if response.StatusCode != 200 {
 		logrus.Error("sendRequest responce code: ", response.StatusCode)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")

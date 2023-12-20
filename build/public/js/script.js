@@ -212,8 +212,10 @@ function updateDataPage(event, ev_type) {
 	} else if (ev_type === "test"){
 		console.log(`update test!`)
 		data["project"] = document.querySelector('#project_options').value
+		data["StartTime"] = document.querySelector('.StartTime').value.replace("T", " ") + ":00Z";
+		data["EndTime"] = document.querySelector('.EndTime').value.replace("T", " ") + ":00Z";
 		console.log(`project: `, data["project"])
-		url = "/get_project_buckets"
+		url = "/get_list_of_tests"
 		select = $('#test_options')
 	} else if (ev_type === "versions") {
 		console.log(`update versions!`)
@@ -276,6 +278,12 @@ function handleStartTest(event) {
 	let gen_type = form.querySelector('.genType')
 	let data = {};
 	event.preventDefault()
+
+	if (git_url.value.trim() === '' || count.value.trim() === '' || gen_type.value.trim() === '') {
+		alert("Необходимо заполнить все поля формы!");
+		return;
+	}
+
 	data["gitlab"] = git_url.value
 	data["count"] = count.value
 	data["resource"] = gen_type.value

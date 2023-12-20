@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
@@ -153,6 +154,22 @@ func compareRelease(c *fiber.Ctx) error {
 	//sendPost(c, url, requestData)
 	sendRequest(c, "Post", url, requestData)
 	return nil
+}
+
+func GetListOfTests(c *fiber.Ctx) error {
+	logrus.Debug("GetListOfTests")
+	url := "/get_project_buckets"
+	body := c.Body()
+	logrus.Debug("GetListOfTests body: ", string(body))
+	res := sendRequest(c, "Post2", url, body)
+	var data []map[string]string
+	err := json.Unmarshal(res, &data)
+	if err != nil {
+		logrus.Error("GetListOfTests Error: ", err)
+		return nil
+	}
+	logrus.Debug("GetListOfTests res: ", string(res))
+	return c.SendString(string(res))
 }
 
 func getCurrentTests(c *fiber.Ctx) error {
