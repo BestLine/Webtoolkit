@@ -20,10 +20,11 @@
                             <input type="number" class="genCount version" id="quantity" name="quantity" min="1" max="10" required>
                         </span>
                     </div>
-                    <div class="input_field_centered">
+                    <div class="input_field">
                         <p class="area_label">Тип генераторов</p>
-                            <i class="fa fa-lock"></i>
+                        <span>
                             {{ unescape .GeneratorsList}}
+                        </span>
                     </div>
                     <input class="button" type="submit" value="Запустить тест" />
                 </form>

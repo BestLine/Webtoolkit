@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -19,6 +20,7 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 	var err error
 	var body map[string]interface{}
 	var byte_body []byte
+	var jsonBody []byte
 
 	for _, arg := range args {
 		switch v := arg.(type) {
@@ -41,34 +43,36 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 		}
 	} else if strArgs[0] == "Post" {
 		logrus.Debug("sendRequest body: ", body)
-		jsonBody, err := json.Marshal(body)
+		jsonBody, err = json.Marshal(body)
 		if err != nil {
-			logrus.Error("Post sending error: ", err)
+			logrus.Error("Post json.Marshal error: ", err)
 			c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
 			return nil
 		}
 		response, err = http.Post(targetURL, "application/json", bytes.NewBuffer(jsonBody))
-	} else if strArgs[0] == "Post2" {
-		logrus.Debug("sendRequest body: ", string(byte_body))
 		if err != nil {
 			logrus.Error("Post sending error: ", err)
 			c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
 			return nil
 		}
+	} else if strArgs[0] == "Post2" {
+		logrus.Debug("sendRequest body: ", string(byte_body))
 		response, err = http.Post(targetURL, "application/json", bytes.NewBuffer(byte_body))
+		if err != nil {
+			logrus.Error("Post sending error: ", err)
+			c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+			return nil
+		}
 	}
 	if err != nil {
 		logrus.Error("sendRequest unknown error: ", err)
 		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
 		return nil
 	}
+	fmt.Println("responce: ", response)
+	fmt.Println("err: ", err)
 	defer response.Body.Close()
 
-	if err != nil {
-		logrus.Error(err)
-		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
-		return nil
-	}
 	logrus.Debug("sendRequest targetURL: ", targetURL)
 	logrus.Debug("sendRequest response: ", response)
 	if response.StatusCode != 200 {

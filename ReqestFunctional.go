@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
@@ -162,12 +161,13 @@ func GetListOfTests(c *fiber.Ctx) error {
 	body := c.Body()
 	logrus.Debug("GetListOfTests body: ", string(body))
 	res := sendRequest(c, "Post2", url, body)
-	var data []map[string]string
-	err := json.Unmarshal(res, &data)
-	if err != nil {
-		logrus.Error("GetListOfTests Error: ", err)
-		return nil
-	}
+	//var data []map[string]string
+	//err := json.Unmarshal(res, &data)
+	//if err != nil {
+	//	logrus.Error("GetListOfTests Error: ", err)
+	//	return nil
+	//}
+	//TODO: фикс ошибки получения списка тестов
 	logrus.Debug("GetListOfTests res: ", string(res))
 	return c.SendString(string(res))
 }
@@ -305,9 +305,13 @@ func assignProjects(c *fiber.Ctx) error {
 func testCreate(c *fiber.Ctx) error {
 	logrus.Debug("testCreate")
 	url := viper.GetString("backend.test_starter") + "/create"
-	//logrus.Debug(string(c.Body())
-	sendRequest(c, "Post", url, string(c.Body()))
-	return c.SendStatus(fiber.StatusOK)
+	res := sendRequest(c, "Post", url, string(c.Body()))
+	if res != nil {
+		return c.SendStatus(fiber.StatusOK)
+	} else {
+		logrus.Error("testCreate SendStatus error!")
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
 }
 
 func getSyncBuckets(c *fiber.Ctx) error {
@@ -316,4 +320,15 @@ func getSyncBuckets(c *fiber.Ctx) error {
 	fmt.Println(res)
 	logrus.Debug(res)
 	return c.SendStatus(fiber.StatusOK)
+}
+
+func makeReport(c *fiber.Ctx) error {
+	logrus.Debug("makeReport")
+	logrus.Debug("makeReport OriginalURL: ", c.OriginalURL())
+	logrus.Debug("makeReport Body: ", string(c.Body()))
+	res := sendRequest(c, "Post2", c.OriginalURL(), c.Body())
+	dataStr := string(res)
+	logrus.Debug("makeReport dataStr: ", dataStr)
+	return c.SendString(dataStr)
+	//TODO: Проверить работу отправки отчёта
 }

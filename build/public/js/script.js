@@ -212,8 +212,8 @@ function updateDataPage(event, ev_type) {
 	} else if (ev_type === "test"){
 		console.log(`update test!`)
 		data["project"] = document.querySelector('#project_options').value
-		data["StartTime"] = document.querySelector('.StartTime').value.replace("T", " ") + ":00Z";
-		data["EndTime"] = document.querySelector('.EndTime').value.replace("T", " ") + ":00Z";
+		data["StartTime"] = document.querySelector('.StartTime').value + ":00Z";
+		data["EndTime"] = document.querySelector('.EndTime').value + ":00Z";
 		console.log(`project: `, data["project"])
 		url = "/get_list_of_tests"
 		select = $('#test_options')

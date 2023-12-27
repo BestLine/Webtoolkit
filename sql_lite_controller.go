@@ -500,6 +500,7 @@ func AddUserToProject(UserName string, Project string) error {
 
 func SyncProjects(Projects []string) error {
 	logrus.Debug("func SyncProjects started!")
+	//TODO: добавить проверку на дубликаты
 	// Start transaction
 	tx, err := db.Begin()
 	if err != nil {
