@@ -19,7 +19,7 @@ func getMainPage(c *fiber.Ctx) error {
 	logrus.Debug("getMainPage")
 	return c.Render("index",
 		fiber.Map{"Table_reports": get_last_10_reports_table(GetTableDataReports(c, "", 10)),
-			"Table_tests":  "get_current_tests(GetTableDataTests(c))",
+			"Table_tests":  GetCurrentTests(c),
 			"Table_status": "get_status_table(GetTableDataStatus(c))",
 		})
 }
@@ -97,9 +97,9 @@ func getMakeReport(c *fiber.Ctx) error {
 	activeProject, _ := GetUserActiveProject(username)
 	projectsList, _ := GetUserProjects(username)
 	isAdmin, _ := hasUserRole(username, "admin")
-	fmt.Println("getMakeReport username ", username)
-	fmt.Println("getMakeReport activeProject ", activeProject)
-	fmt.Println("getMakeReport projectsList ", projectsList)
+	//fmt.Println("getMakeReport username ", username)
+	//fmt.Println("getMakeReport activeProject ", activeProject)
+	//fmt.Println("getMakeReport projectsList ", projectsList)
 	if isAdmin {
 		projectsList, _ = GetAllProjects()
 		activeProject = "Выберите проект"
@@ -176,4 +176,11 @@ func getAdminSubscription(c *fiber.Ctx) error {
 	logrus.Debug("getAdminSubscription")
 	return c.Render("adminSubscription",
 		fiber.Map{"SelectUsers": select_all_users(), "SelectProjects": checkbox_all_projects()})
+}
+
+func getCurrentTests(c *fiber.Ctx) error {
+	logrus.Debug("getCurrentTests")
+	res := GetCurrentTests(c)
+	return c.Render("current_tests",
+		fiber.Map{"CurrentTests": res})
 }

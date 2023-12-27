@@ -172,35 +172,6 @@ func GetListOfTests(c *fiber.Ctx) error {
 	return c.SendString(string(res))
 }
 
-func getCurrentTests(c *fiber.Ctx) error {
-	logrus.Debug("getCurrentTests")
-	url := "/beeload/get/tabledatacurrenttests"
-	//res := sendGet(c, url)
-	res := sendRequest(c, "Get", url)
-	dataStr := string(res)
-
-	// Разбиваем на строки
-	rows := strings.Split(dataStr, "},{")
-
-	// Подготовка для парсинга
-	var data [][]string
-	for _, row := range rows {
-		// Удаление лишних символов
-		row = strings.Trim(row, "[{]}")
-		// Разбиваем на элементы
-		items := strings.Split(row, ",")
-		var itemStrings []string
-		for _, item := range items {
-			item = strings.Trim(item, "\" ")
-			itemStrings = append(itemStrings, item)
-		}
-		data = append(data, itemStrings)
-	}
-	//fmt.Println(data)
-	return c.Render("current_tests",
-		fiber.Map{"CurrentTests": get_test_table(data)})
-}
-
 func addProject(c *fiber.Ctx) error {
 	logrus.Debug("addProject")
 	value := c.Locals("user")
@@ -327,8 +298,13 @@ func makeReport(c *fiber.Ctx) error {
 	logrus.Debug("makeReport OriginalURL: ", c.OriginalURL())
 	logrus.Debug("makeReport Body: ", string(c.Body()))
 	res := sendRequest(c, "Post2", c.OriginalURL(), c.Body())
-	dataStr := string(res)
-	logrus.Debug("makeReport dataStr: ", dataStr)
-	return c.SendString(dataStr)
+	if res != nil {
+		dataStr := string(res)
+		logrus.Debug("makeReport dataStr: ", dataStr)
+		return c.SendString(dataStr)
+	} else {
+		logrus.Debug("makeReport sendRequest error! ")
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
 	//TODO: Проверить работу отправки отчёта
 }

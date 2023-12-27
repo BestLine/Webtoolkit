@@ -64,31 +64,43 @@ func get_last_10_reports_table(data TestsTableData) string {
 	return table
 }
 
-func get_current_tests(data CurrentTestsTableData) string {
-	table := "<table>\n"
-	table += "<thead>\n"
-	table += "<tr>\n"
-	table += "<th>Проект</th>\n"
-	table += "<th>Бакет</th>\n"
-	table += "<th>Время старта</th>\n"
-	table += "<th>Статус теста</th>\n"
-	table += "<th>Тип теста</th>\n"
-	table += "</tr>\n"
-	table += "</thead>\n"
-	table += "<tbody>\n"
-	for _, row := range data.Data {
-		table += "<tr>\n"
-		table += "<td>" + row.Project + "</td>\n"
-		table += "<td>" + row.Bucket + "</td>\n"
-		table += "<td>" + row.StartTime + "</td>\n"
-		table += "<td>" + row.Status + "</td>\n"
-		table += "<td>" + row.Type + "</td>\n"
-		table += "</tr>\n"
+func GetCurrentTests(c *fiber.Ctx) string {
+	var err error
+	var response *http.Response
+	var testData TestData
+	var result [][]string
+	logrus.Debug("GetCurrentTests")
+	url := "http://ms-loadrtst026:8001/test/live"
+	response, err = http.Get(url)
+	if err != nil {
+		logrus.Error("Get sending error: ", err)
+		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+		return ""
 	}
-	table += "</tbody>\n"
-	table += "</table>\n"
-	fmt.Println("awd: ", table)
-	return table
+
+	byte_reader := RespToByteReader(response)
+	fmt.Println("GetCurrentTests responce: ", string(byte_reader))
+	defer response.Body.Close()
+	logrus.Debug("GetCurrentTests targetURL: ", url)
+	logrus.Debug("GetCurrentTests response: ", string(byte_reader))
+
+	if response.StatusCode != 200 {
+		logrus.Error("GetCurrentTests responce code: ", response.StatusCode)
+		c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+		return ""
+	}
+
+	err = json.Unmarshal(byte_reader, &testData)
+	if err != nil {
+		logrus.Error("Error decoding JSON:", err)
+		return ""
+	}
+
+	for _, test := range testData.Tests {
+		result = append(result, []string{test.Application, test.Bucket})
+	}
+
+	return get_test_table(result)
 }
 
 func get_status_table(data [][]string) string {
@@ -146,9 +158,8 @@ func get_test_table(data [][]string) string {
 	table := "<table>\n"
 	table += "<thead>\n"
 	table += "<tr>\n"
-	table += "<th>Система</th>\n"
-	table += "<th>Бакет</th>\n"
-	table += "<th>Статус</th>\n"
+	table += "<th>Тест</th>\n"
+	table += "<th>Проект</th>\n"
 	table += "<th>Перезапустить</th>\n"
 	table += "<th>Остановить</th>\n"
 	table += "</tr>\n"
