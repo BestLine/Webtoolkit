@@ -276,7 +276,7 @@ func assignProjects(c *fiber.Ctx) error {
 func testCreate(c *fiber.Ctx) error {
 	logrus.Debug("testCreate")
 	url := viper.GetString("backend.test_starter") + "/create"
-	res := sendRequest(c, "Post", url, string(c.Body()))
+	res := sendRequest(c, "Post3", url, string(c.Body()))
 	if res != nil {
 		return c.SendStatus(fiber.StatusOK)
 	} else {

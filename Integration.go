@@ -63,6 +63,15 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 			c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
 			return nil
 		}
+	} else if strArgs[0] == "Post3" {
+		logrus.Debug("sendRequest body: ", string(byte_body))
+		targetURL = strArgs[1]
+		response, err = http.Post(targetURL, "application/json", bytes.NewBuffer(jsonBody))
+		if err != nil {
+			logrus.Error("Post sending error: ", err)
+			c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+			return nil
+		}
 	}
 	if err != nil {
 		logrus.Error("sendRequest unknown error: ", err)
