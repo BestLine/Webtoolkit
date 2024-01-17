@@ -6,27 +6,14 @@
         <div class="row clearfix">
             <div class="">
                 <form class="formWithValidation" id="SetReportHomePage">
-                    <div class="input_field select_option">
+                    <div class="input_field_centered select_option">
                         <p class="area_label">URL</p>
                         <span>
                             <i class="fa fa-clock"></i>
                             <input type="text" class="gitUrl version" id="test_url" name="UrlInput" required>
                         </span>
                     </div>
-                    <div class="input_field left">
-                        <p class="area_label">Количество генераторов</p>
-                        <span>
-                            <i class="fa fa-clock"></i>
-                            <input type="number" class="genCount version" id="quantity" name="quantity" min="1" max="10" required>
-                        </span>
-                    </div>
-                    <div class="input_field">
-                        <p class="area_label">Тип генераторов</p>
-                        <span>
-                            {{ unescape .GeneratorsList}}
-                        </span>
-                    </div>
-                    <input class="button" type="submit" value="Запустить тест" />
+                    <input class="button" type="submit" value="Далее" />
                 </form>
             </div>
         </div>

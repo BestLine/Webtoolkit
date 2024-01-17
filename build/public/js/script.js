@@ -161,7 +161,7 @@ function NavbarLeftHandler() {
 						"color: red; " +
 						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
 				} else {
-					document.querySelector('.formWithValidation').addEventListener('submit', handleStartTest)
+					document.querySelector('.formWithValidation').addEventListener('submit', handleStartTestParseEnv)
 				}
 			})
 		}
@@ -271,7 +271,57 @@ function handleCompareRelease(event) {
 	xhr.send(JSON.stringify(data));
 }
 
+function goBack() {
+	$( "#wrapper" ).load( "/start_test", function(responseText, textStatus) {
+		if (textStatus === "error") {
+			// В случае ошибки загрузки, выводим сообщение
+			$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+				"color: red; " +
+				"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+		} else {
+			document.querySelector('.formWithValidation').addEventListener('click', handleStartTestParseEnv)
+		}
+	})
+}
+
+function startTest() {
+	var formData = new FormData(document.getElementById('TestStartForm'));
+	var data = {};
+	event.preventDefault()
+	formData.forEach(function(value, key){
+		data[key] = value;
+	});
+	console.log("startTest JSON: ", JSON.stringify(data))
+	send_request_with_notification2(data, '/parse/env', "Статус: Запрос на запуск теста отправлен")
+}
+
+function handleStartTestParseEnv(event) {
+	//TODO: здесь мы делаем отправку гит ссылки и отрисовку переменных
+	let form = document.querySelector('.formWithValidation')
+	let git_url = form.querySelector('.gitUrl')
+	let data = {};
+
+	event.preventDefault()
+
+	data["gitlab"] = git_url.value
+
+	console.log("handleStartTestParseEnv JSON: ", JSON.stringify(data))
+	fetch('/parse/env', {
+		method: 'POST',
+		body: data
+	})
+		.then(response => response.text())
+		.then(result => $("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+			"color: blue; " +
+			"font-size: 20px;\">" + result + "</div>"))
+
+	//TODO: вставить готовый ответ!!!!!
+}
+
 function handleStartTest(event) {
+	//TODO: надо переделать обработку в соответствии с парсингом окружения
+	//TODO: надо переделать обработку в соответствии с парсингом окружения
+	//TODO: надо переделать обработку в соответствии с парсингом окружения
 	let form = document.querySelector('.formWithValidation')
 	let git_url = form.querySelector('.gitUrl')
 	let count = form.querySelector('.genCount')
@@ -287,7 +337,7 @@ function handleStartTest(event) {
 	data["gitlab"] = git_url.value
 	data["count"] = count.value
 	data["resource"] = gen_type.value
-	console.log("JSON: ", JSON.stringify(data))
+	console.log("handleStartTest JSON: ", JSON.stringify(data))
 	send_request_with_notification(data, "/beeload/test/create", "Статус: Запрос на запуск теста отправлен")
 }
 
@@ -357,6 +407,37 @@ function setActiveProject(event) {
 	updateDataPage(event, "versions")
 	data["project_name"] = selectedValue
 	send_request_with_notification(data, "/beeload/set/project", "Выбран проект: " + selectedValue)
+}
+
+function send_request_with_notification2(data, url, message) {
+	console.log("send_request_with_notification");
+	let msg = document.querySelector('.error_message');
+
+	fetch(url, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json; charset=UTF-8',
+		},
+		body: JSON.stringify(data),
+	})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return response.json();
+		})
+		.then(result => {
+			// Дополнительная логика после успешного запроса
+			msg.textContent = message;
+		})
+		.catch(error => {
+			// Обработка ошибок
+			if (error instanceof TypeError) {
+				msg.textContent = "Сетевая ошибка: " + error.message;
+			} else {
+				msg.textContent = "Неизвестная ошибка: " + error.message;
+			}
+		});
 }
 
 function send_request_with_notification(data, url, message) {
