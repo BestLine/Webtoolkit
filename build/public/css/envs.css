@@ -4,21 +4,87 @@
     align-items: center;
     justify-content: center;
     margin: auto; /* Центрирует форму по горизонтали */
-    max-width: 400px; /* Максимальная ширина формы */
+    max-width: 600px; /* Максимальная ширина формы */
     padding: 20px;
     border: 1px solid #ccc; /* Добавление рамки для формы */
+}
+
+#TestStartForm .back_button {
+    height: 35px;
+    width: 20%;
+    margin: 15px;
+    background-color: #f5ba1a;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#TestStartForm .submit_button {
+    height: 35px;
+    width: 20%;
+    margin: 15px;
+    background-color: #f5ba1a;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
 #TestStartForm .Envs_top {
     border: 1px solid #ccc; /* Добавление рамки для .Envs_top */
     padding: 10px;
     margin-bottom: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+#TestStartForm .Envs_top>div>p {
+    margin: 1px;
+}
+
+#TestStartForm .Envs_top>div>span>i {
+    position: absolute;
+    height: 35px;
+    width: 35px;
+    padding-top: 10px;
+    border-right: 1px solid black;
+}
+
+#quantity {
+    width: 17%;
+    height: 35px;
+    padding-left: 40px;
+    margin-bottom: 15px;
+
+}
+
+#TestStartForm .Envs_top>div>span>input {
+    margin-bottom: 15px;
+    width: 90%;
+    height: 35px;
+}
+
+#TestStartForm .Envs_top>div>span>select {
+    height: 35px;
+    text-align: center;
+    width: 40%;
 }
 
 #TestStartForm .Envs {
     border: 1px solid #ccc; /* Добавление рамки для .Envs */
     padding: 10px;
     margin-top: 10px;
+    width: 100%;
+}
+
+#TestStartForm .Envs>div>p {
+    padding-left: 10px;
+    height: 35px;
+    padding-top: 15px;
+    position: absolute;
+}
+
+#TestStartForm .Envs>div>input {
+    margin-left: 110px;
+    height: 35px;
+    width: 90%;
 }
 
 /* Стили для формы и её контейнеров */
