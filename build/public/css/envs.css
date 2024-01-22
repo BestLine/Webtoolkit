@@ -1,0 +1,38 @@
+#TestStartForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: auto; /* Центрирует форму по горизонтали */
+    max-width: 400px; /* Максимальная ширина формы */
+    padding: 20px;
+    border: 1px solid #ccc; /* Добавление рамки для формы */
+}
+
+#TestStartForm .Envs_top {
+    border: 1px solid #ccc; /* Добавление рамки для .Envs_top */
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+#TestStartForm .Envs {
+    border: 1px solid #ccc; /* Добавление рамки для .Envs */
+    padding: 10px;
+    margin-top: 10px;
+}
+
+/* Стили для формы и её контейнеров */
+#TestStartForm .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#TestStartForm .form-label {
+    flex-basis: 120px;
+    margin-right: 10px;
+}
+
+#TestStartForm .form-input {
+    flex-grow: 1;
+}

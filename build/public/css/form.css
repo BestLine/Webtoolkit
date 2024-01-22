@@ -146,6 +146,17 @@ body {
     float: left
 }
 
+.form_wrapper .input_field_centered {
+    position: relative;
+    padding: 40px;
+    margin-bottom: 20px;
+    width: 50%;
+    -webkit-animation: bounce .6s ease-out;
+    animation: bounce .6s ease-out;
+    display: contents;
+    /*float: right*/
+}
+
 .form_wrapper .left {
     float: left
 }
@@ -178,16 +189,7 @@ body {
     height: 35px
 }
 
-.form_wrapper .input_field_centered {
-    position: relative;
-    padding: 40px;
-    margin-bottom: 20px;
-    width: 50%;
-    -webkit-animation: bounce .6s ease-out;
-    animation: bounce .6s ease-out;
-    display: contents;
-    /*float: right*/
-}
+
 
 .form_wrapper .fa-lock {
     position: absolute;

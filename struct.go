@@ -314,3 +314,7 @@ type GitEnvData struct {
 		Value string `json:"value"`
 	} `json:"data"`
 }
+
+type GitLabUrl struct {
+	Gitlab string `json:"gitlab"`
+}

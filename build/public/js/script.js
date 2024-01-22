@@ -285,14 +285,28 @@ function goBack() {
 }
 
 function startTest() {
-	var formData = new FormData(document.getElementById('TestStartForm'));
-	var data = {};
 	event.preventDefault()
-	formData.forEach(function(value, key){
-		data[key] = value;
+	let gitlab = document.getElementById('url').value;
+	let count = document.getElementById('quantity').value;
+	let resource = document.getElementsByName('generator')[0].value;
+	let envsData = [];
+	let envFields = document.querySelectorAll('.Envs div');
+
+	envFields.forEach(function(envField) {
+		let key = envField.querySelector('.area_label').textContent.toLowerCase();
+		let value = envField.querySelector('input').value;
+		envsData.push({ key: key, value: value });
 	});
+
+	let data = {
+		gitlab: gitlab,
+		count: count,
+		resource: resource,
+		data: envsData
+	};
+
 	console.log("startTest JSON: ", JSON.stringify(data))
-	send_request_with_notification2(data, '/parse/env', "Статус: Запрос на запуск теста отправлен")
+	send_request_with_notification2(data, '/beeload/test/create', "Статус: Запрос на запуск теста отправлен")
 }
 
 function handleStartTestParseEnv(event) {
@@ -308,14 +322,10 @@ function handleStartTestParseEnv(event) {
 	console.log("handleStartTestParseEnv JSON: ", JSON.stringify(data))
 	fetch('/parse/env', {
 		method: 'POST',
-		body: data
+		body: JSON.stringify(data)
 	})
 		.then(response => response.text())
-		.then(result => $("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-			"color: blue; " +
-			"font-size: 20px;\">" + result + "</div>"))
-
-	//TODO: вставить готовый ответ!!!!!
+		.then(result => $("#wrapper").html("<div class=\"main_page\">" + result + "</div>"))
 }
 
 function handleStartTest(event) {

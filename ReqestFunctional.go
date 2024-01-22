@@ -314,30 +314,43 @@ func startTestParseEnv(c *fiber.Ctx) error {
 	logrus.Debug("startTestParseEnv")
 	logrus.Debug("startTestParseEnv OriginalURL: ", c.OriginalURL())
 	logrus.Debug("startTestParseEnv Body: ", string(c.Body()))
-	//res := sendRequest(c, "Post2", c.OriginalURL(), c.Body())
 	res := sendRequest(c, "Post3", viper.GetString("backend.test_starter")+c.OriginalURL(), c.Body())
 	envs := new(GitEnvData)
 	if err := json.Unmarshal(res, envs); err != nil {
 		logrus.Error("startTestParseEnv Unmarshal error", err)
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
+	gitUrl := new(GitLabUrl)
+	if err := json.Unmarshal(c.Body(), gitUrl); err != nil {
+		logrus.Error("startTestParseEnv Unmarshal gitUrl error", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
 	fmt.Println("ENVS: ", envs.Data)
 	resp := "<form class=\"formTestStart\" id=\"TestStartForm\">\n"
 	resp += "<input class=\"back_button\" type=\"submit\" value=\"Назад\" onclick=\"goBack()\"/>\n"
-	resp += "<div class=\"input_field left\">\n " +
-		"<p class=\"area_label\">Количество генераторов</p>\n " +
-		"<span>\n " +
-		"<i class=\"fa fa-clock\"></i>\n " +
-		"<input type=\"number\" class=\"genCount version\" id=\"quantity\" name=\"quantity\" min=\"1\" max=\"10\" required>\n " +
-		"</span>\n " +
-		"</div>\n " +
+	resp += "<div class=\"Envs_top\" id=\"env\">\n"
+	resp +=
 		"<div class=\"input_field\">\n " +
-		"<p class=\"area_label\">Тип генераторов</p>\n " +
-		"<span>\n " + make_generators_list() + "\n " + "</span>\n " +
-		"</div>"
-	resp += "<div class=\"Envs\" id=\"env\">"
+			"<p class=\"area_label\">URL</p>\n " +
+			"<span>\n " +
+			"<input type=\"text\" class=\"GitUrl version\" id=\"url\" name=\"url\" value=\"" + gitUrl.Gitlab + "\">\n " +
+			"</span>\n " +
+			"</div>\n" +
+			"<div class=\"input_field left\">\n " +
+			"<p class=\"area_label\">Количество генераторов</p>\n " +
+			"<span>\n " +
+			"<i class=\"fa fa-clock\"></i>\n " +
+			"<input type=\"number\" class=\"genCount version\" id=\"quantity\" name=\"quantity\" min=\"1\" max=\"10\" required>\n " +
+			"</span>\n " +
+			"</div>\n " +
+			"<div class=\"input_field\">\n " +
+			"<p class=\"area_label\">Аппаратная конфигурация</p>\n " +
+			"<span>\n " + make_generators_list() + "\n " + "</span>\n " +
+			"</div>\n"
+	resp += "</div>\n"
+	resp += "<div class=\"Envs\" id=\"env\">\n"
 	for _, env := range envs.Data {
-		resp += "<div>\n"
+		resp += "<div class=\"form-row\">\n"
 		resp += "<p class=\"area_label\">" + env.Key + "</p>\n"
 		resp += "<input type=\"text\" name=\"" + env.Key + "\" value=\"" + env.Value + "\"/>\n"
 		resp += "</div>\n"
