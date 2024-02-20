@@ -174,8 +174,24 @@ func getSettings(c *fiber.Ctx) error {
 
 func getAdminSubscription(c *fiber.Ctx) error {
 	logrus.Debug("getAdminSubscription")
-	return c.Render("adminSubscription",
-		fiber.Map{"SelectUsers": select_all_users(), "SelectProjects": checkbox_all_projects()})
+	value := c.Locals("user")
+	claims, ok := (value).(*jwt.MapClaims)
+	username, ok := (*claims)["username"].(string)
+	if !ok {
+		// Обработка ошибки преобразования
+		logrus.Error("getSettings: username conversion failed")
+		return fmt.Errorf("username conversion failed")
+	}
+
+	subs, telNumber := get_subs_by_username(username)
+	fmt.Println(subs)
+	if subs != nil {
+		return c.Render("adminSubscription",
+			fiber.Map{"SelectProjects": checkbox_for_projects(subs), "TelNumber": telNumber})
+	} else {
+		return c.Render("adminSubscription",
+			fiber.Map{"SelectProjects": checkbox_all_projects(), "TelNumber": telNumber})
+	}
 }
 
 func getCurrentTests(c *fiber.Ctx) error {
@@ -183,4 +199,9 @@ func getCurrentTests(c *fiber.Ctx) error {
 	res := GetCurrentTests(c)
 	return c.Render("current_tests",
 		fiber.Map{"CurrentTests": res})
+}
+
+func testView(c *fiber.Ctx) error {
+	return c.Render("scenario_generator",
+		fiber.Map{"CurrentTests": "res"})
 }

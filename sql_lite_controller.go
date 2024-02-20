@@ -112,6 +112,25 @@ func createSQLiteDB() error {
 		)
 	`)
 
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS user_phones (
+			user_id INTEGER NOT NULL,
+			phone_number VARCHAR(15) NOT NULL,
+			FOREIGN KEY (user_id) REFERENCES users(id),
+			PRIMARY KEY (user_id, phone_number)
+		)
+	`)
+
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS subscription_lists (
+			phone_number VARCHAR(15) NOT NULL,
+			project_id INTEGER NOT NULL,
+			FOREIGN KEY (phone_number) REFERENCES user_phones(phone_number),
+			FOREIGN KEY (project_id) REFERENCES projects(id),
+			PRIMARY KEY (phone_number, project_id)
+		)
+	`)
+
 	var count int
 	err = db.QueryRow("SELECT COUNT(*) FROM users WHERE username = 'admin'").Scan(&count)
 	if count == 0 {
@@ -537,6 +556,161 @@ func SyncProjects(Projects []string) error {
 		}
 	}
 	return nil
+}
+
+func set_telnumber_to_username(UserName string, telNumber string) error {
+	logrus.Debug("set_telnumber_to_username")
+	fmt.Printf("set_telnumber_to_username telNumber: %v, тип: %T", telNumber, telNumber)
+	fmt.Printf("set_telnumber_to_username UserName: %v, тип: %T", UserName, UserName)
+	Query := `INSERT OR IGNORE INTO user_phones (user_id, phone_number)
+		SELECT users.id, ?
+		FROM users
+		WHERE users.username = ?
+	`
+	_, err := db.Exec(Query, telNumber, UserName)
+	if err != nil {
+		logrus.Error("set_telnumber_to_username ERROR: ", err)
+		return err
+	}
+	return nil
+}
+
+func get_telnumber_by_username(UserName string) (string, error) {
+	logrus.Debug("get_telnumber_by_username")
+	var phoneNumber string
+
+	query := `
+        SELECT user_phones.phone_number
+        FROM user_phones
+        JOIN users ON user_phones.user_id = users.id
+        WHERE users.username = ?
+    `
+
+	err := db.QueryRow(query, UserName).Scan(&phoneNumber)
+	if err != nil {
+		logrus.Error(err)
+		return "", err
+	}
+
+	return phoneNumber, nil
+}
+
+func set_subs_by_telnumber(phoneNumber string, projectNames []string) error {
+	//TODO: НЕ РАБОТАИТ!!!
+	//TODO: НЕ РАБОТАИТ!!!
+	//TODO: НЕ РАБОТАИТ!!!
+	//TODO: НЕ РАБОТАИТ!!!
+	//TODO: НЕ РАБОТАИТ!!!
+	//TODO: НЕ РАБОТАИТ!!!
+	//TODO: НЕ РАБОТАИТ!!!
+	//TODO: НЕ РАБОТАИТ!!!
+	logrus.Debug("set_subs_by_telnumber")
+	fmt.Printf("set_subs_by_telnumber phoneNumber: %v, тип: %T\n", phoneNumber, phoneNumber)
+	fmt.Printf("set_subs_by_telnumber projectNames: %v, тип: %T\n", projectNames, projectNames)
+	tx, err := db.Begin()
+	if err != nil {
+		logrus.Error(err)
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			logrus.Error(err)
+		} else {
+			err = tx.Commit()
+			if err != nil {
+				logrus.Error(err)
+			}
+		}
+	}()
+
+	// Удаляем существующие записи для данного номера телефона
+	_, err = tx.Exec("DELETE FROM subscription_lists WHERE phone_number = ?", phoneNumber)
+	if err != nil {
+		return err
+	}
+
+	// Получаем id проектов по их именам
+	projectIDs, err := getProjectIDsByName(projectNames)
+	if err != nil {
+		return err
+	}
+
+	// Вставляем новые записи
+	stmt, err := tx.Prepare("INSERT OR IGNORE INTO subscription_lists (phone_number, project_id) VALUES (?, ?)")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for _, projectID := range projectIDs {
+		_, err = stmt.Exec(phoneNumber, projectID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func get_subs_by_telnumber(phoneNumber string) ([]string, error) {
+	logrus.Debug("get_subs_by_telnumber")
+	var projectNames []string
+
+	// Запрос для получения имен проектов по номеру телефона
+	query := `
+        SELECT projects.project_name
+        FROM subscription_lists
+        JOIN projects ON subscription_lists.project_id = projects.id
+        WHERE subscription_lists.phone_number = ?
+    `
+
+	rows, err := db.Query(query, phoneNumber)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var projectName string
+		if err := rows.Scan(&projectName); err != nil {
+			return nil, err
+		}
+		projectNames = append(projectNames, projectName)
+	}
+
+	return projectNames, nil
+}
+
+func getProjectIDsByName(projectNames []string) ([]int, error) {
+	logrus.Debug("getProjectIDsByName")
+	var projectIDs []int
+
+	// Создаем строку с плейсхолдерами для IN оператора
+	placeholders := make([]interface{}, len(projectNames))
+	for i := range projectNames {
+		placeholders[i] = "?"
+	}
+
+	// Запрос для получения id проектов по их именам
+	query := fmt.Sprintf("SELECT id FROM projects WHERE project_name IN (?)")
+
+	// Получаем id проектов
+	rows, err := db.Query(query, placeholders...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var projectID int
+		if err := rows.Scan(&projectID); err != nil {
+			return nil, err
+		}
+		projectIDs = append(projectIDs, projectID)
+	}
+	logrus.Debug("getProjectIDsByName finished")
+	return projectIDs, nil
 }
 
 func test1(Projects []string) error {

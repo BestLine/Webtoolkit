@@ -161,7 +161,7 @@ function NavbarLeftHandler() {
 						"color: red; " +
 						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
 				} else {
-					document.querySelector('.formWithValidation').addEventListener('submit', handleStartTestParseEnv)
+					// document.querySelector('.formWithValidation').addEventListener('submit', handleStartTestParseEnv)
 				}
 			})
 		}
@@ -287,8 +287,9 @@ function goBack() {
 function startTest() {
 	event.preventDefault()
 	let gitlab = document.getElementById('url').value;
-	let count = document.getElementById('quantity').value;
+	let count = parseInt(document.getElementById('quantity').value, 10);
 	let resource = document.getElementsByName('generator')[0].value;
+
 	let envsData = [];
 	let envFields = document.querySelectorAll('.Envs div');
 
@@ -309,18 +310,26 @@ function startTest() {
 	send_request_with_notification2(data, '/beeload/test/create', "Статус: Запрос на запуск теста отправлен")
 }
 
-function handleStartTestParseEnv(event) {
+function handleStartTestParseEnv(event, scenario) {
 	//TODO: здесь мы делаем отправку гит ссылки и отрисовку переменных
+	console.log("handleStartTestParseEnv scenario: ", scenario)
 	let form = document.querySelector('.formWithValidation')
 	let git_url = form.querySelector('.gitUrl')
 	let data = {};
-
+	let url = ''
 	event.preventDefault()
-
 	data["gitlab"] = git_url.value
-
+	//TODO:  здесб нужно сделать отправку одной из двух форм в зависимости от выбранной кнопки
+	//TODO:  здесб нужно сделать отправку одной из двух форм в зависимости от выбранной кнопки
+	//TODO:  здесб нужно сделать отправку одной из двух форм в зависимости от выбранной кнопки
+	//TODO:  здесб нужно сделать отправку одной из двух форм в зависимости от выбранной кнопки
 	console.log("handleStartTestParseEnv JSON: ", JSON.stringify(data))
-	fetch('/parse/env', {
+	if (scenario===true) {
+		url = '/parse/env'
+	} else {
+		url = '/parse/env/custom'
+	}
+	fetch(url, {
 		method: 'POST',
 		body: JSON.stringify(data)
 	})
@@ -532,6 +541,19 @@ function handleMakeReport(event) {
 function toTimestamp(strDate){
 	let datum = Date.parse(strDate);
 	return datum/1000;
+}
+
+function openNewTab(project, test) {
+	var url =
+		"http://grafana.qa-auto.vimpelcom.ru/d/ms5SULTnz/apache-jmeter-dashboard-using-core-influxdbbackendlistenerclient?" +
+		"orgId=1&" +
+		"refresh=30s&" +
+		"var-data_source=" + project + "&" +
+		"var-application=" + test + "&" +
+		"var-measurement_name=jmeter&" +
+		"var-send_interval=5&" +
+		"from=now-15m&to=now";
+	window.open(url, '_blank');
 }
 
 $(document).ready(function(){

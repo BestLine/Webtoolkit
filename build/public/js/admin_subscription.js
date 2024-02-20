@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('submit', function (event) {
         event.preventDefault();
 
-        const userSelect = document.querySelector(".user");
+        const phone = document.querySelector(".phone");
         const projectCheckboxes = document.querySelectorAll('input[name="projects"]:checked');
 
         const userData = {
-            user: userSelect.value,
+            user: phone.value,
             projects: Array.from(projectCheckboxes).map(cb => cb.value).join(',')
         };
 

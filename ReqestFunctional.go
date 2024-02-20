@@ -162,13 +162,6 @@ func GetListOfTests(c *fiber.Ctx) error {
 	body := c.Body()
 	logrus.Debug("GetListOfTests body: ", string(body))
 	res := sendRequest(c, "Post2", url, body)
-	//var data []map[string]string
-	//err := json.Unmarshal(res, &data)
-	//if err != nil {
-	//	logrus.Error("GetListOfTests Error: ", err)
-	//	return nil
-	//}
-	//TODO: фикс ошибки получения списка тестов
 	logrus.Debug("GetListOfTests res: ", string(res))
 	return c.SendString(string(res))
 }
@@ -261,15 +254,27 @@ func setActiveUserProject(c *fiber.Ctx) error {
 
 func assignProjects(c *fiber.Ctx) error {
 	logrus.Debug("assignProjects")
-	username := c.FormValue("user")
-	projectNames := strings.Split(c.FormValue("projects"), ",")
-	fmt.Printf("Username: %s\n", username)
-	fmt.Printf("Projects: %v\n", projectNames)
-	err := AddUserSubscriptions(username, projectNames)
+	value := c.Locals("user")
+	claims, _ := (value).(*jwt.MapClaims)
+	username, _ := (*claims)["username"].(string)
+	phone := c.FormValue("phone")
+	projectNames := c.FormValue("projects")
+	//fmt.Printf("phone: %s\n", phone, reflect.TypeOf(phone))
+	//fmt.Printf("Projects: %v\n", projectNames, reflect.TypeOf(projectNames))
+	//fmt.Printf("username: %v\n", username, reflect.TypeOf(username))
+	//err := AddUserSubscriptions(username, projectNames)
+	err := set_telnumber_to_username(username, phone)
 	if err != nil {
-		logrus.Error("assignProjects ERROR: ", err)
+		logrus.Error("assignProjects set_telnumber_to_username ERROR: ", err)
 		return err
 	}
+	logrus.Debug("projectNames: ", projectNames, "\n ", strings.Split(projectNames, ","))
+	err = set_subs_by_telnumber(phone, strings.Split(projectNames, ","))
+	if err != nil {
+		logrus.Error("assignProjects set_subs_by_telnumber ERROR: ", err)
+		return err
+	}
+	//TODO: добавить отправку запроса с подписками на бек
 	//TODO: необходимо добавить синхронизацию подписок с беком
 	return c.SendStatus(fiber.StatusOK)
 }
@@ -312,9 +317,19 @@ func makeReport(c *fiber.Ctx) error {
 
 func startTestParseEnv(c *fiber.Ctx) error {
 	logrus.Debug("startTestParseEnv")
-	logrus.Debug("startTestParseEnv OriginalURL: ", c.OriginalURL())
+	url := c.OriginalURL()
+	logrus.Debug("startTestParseEnv OriginalURL: ", url)
 	logrus.Debug("startTestParseEnv Body: ", string(c.Body()))
-	res := sendRequest(c, "Post3", viper.GetString("backend.test_starter")+c.OriginalURL(), c.Body())
+	if strings.HasPrefix(url, "/parse/env/custom") {
+		parts := strings.SplitN(url, "/custom", 2)
+		trimmedPath := parts[0]
+		logrus.Debug("trimmedPath: ", trimmedPath)
+		url = trimmedPath
+		//TODO: обработка энвов для постоения сценария
+		return c.Render("scenario_generator",
+			fiber.Map{"CurrentTests": "res"})
+	}
+	res := sendRequest(c, "Post3", viper.GetString("backend.test_starter")+url, c.Body())
 	envs := new(GitEnvData)
 	if err := json.Unmarshal(res, envs); err != nil {
 		logrus.Error("startTestParseEnv Unmarshal error", err)
@@ -331,7 +346,7 @@ func startTestParseEnv(c *fiber.Ctx) error {
 	resp += "<div class=\"Envs_top\" id=\"env\">\n"
 	resp +=
 		"<div class=\"input_field\">\n " +
-			"<p class=\"area_label\">URL</p>\n " +
+			"<p class=\"area_label\">GIT URL</p>\n " +
 			"<span>\n " +
 			"<input type=\"text\" class=\"GitUrl version\" id=\"url\" name=\"url\" value=\"" + gitUrl.Gitlab + "\">\n " +
 			"</span>\n " +
@@ -340,12 +355,21 @@ func startTestParseEnv(c *fiber.Ctx) error {
 			"<p class=\"area_label\">Количество генераторов</p>\n " +
 			"<span>\n " +
 			"<i class=\"fa fa-clock\"></i>\n " +
-			"<input type=\"number\" class=\"genCount version\" id=\"quantity\" name=\"quantity\" min=\"1\" max=\"10\" required>\n " +
+			"<input type=\"number\" class=\"genCount version\" id=\"quantity\" name=\"quantity\" min=\"1\" max=\"10\" value=\"1\" required>\n " +
 			"</span>\n " +
 			"</div>\n " +
 			"<div class=\"input_field\">\n " +
 			"<p class=\"area_label\">Аппаратная конфигурация</p>\n " +
 			"<span>\n " + make_generators_list() + "\n " + "</span>\n " +
+			"</div>\n" +
+			"<div class=\"input_field\">\n " +
+			"<p class=\"area_label\">Выбор файла для запуска</p>\n " +
+			"<span>\n " +
+			"<select>" +
+			"<option>Module1</option>" +
+			"<option>Module2</option>" +
+			"</select>" +
+			"</span>\n " +
 			"</div>\n"
 	resp += "</div>\n"
 	resp += "<div class=\"Envs\" id=\"env\">\n"

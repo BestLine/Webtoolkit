@@ -289,6 +289,7 @@ type CurrentTestsTableData struct {
 type Test struct {
 	Application string `json:"application"`
 	Bucket      string `json:"bucket"`
+	State       string `json:"state"`
 }
 
 type TestData struct {

@@ -63,6 +63,8 @@ func setupProtectedRoutes(app *fiber.App) {
 	app.Post("/get_host_list", GetHostList)
 	app.Post("/assignProjects", assignProjects)
 	app.Post("/parse/env", startTestParseEnv)
+	app.Post("/parse/env/custom", startTestParseEnv) //TODO: делать обработку создания сценария
+	app.Get("/test", testView)
 }
 
 var db *sql.DB

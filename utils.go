@@ -97,7 +97,7 @@ func GetCurrentTests(c *fiber.Ctx) string {
 	}
 
 	for _, test := range testData.Tests {
-		result = append(result, []string{test.Application, test.Bucket})
+		result = append(result, []string{test.Application, test.Bucket, test.State})
 	}
 
 	return get_test_table(result)
@@ -160,6 +160,7 @@ func get_test_table(data [][]string) string {
 	table += "<tr>\n"
 	table += "<th>Тест</th>\n"
 	table += "<th>Проект</th>\n"
+	table += "<th>Графана</th>\n"
 	table += "<th>Перезапустить</th>\n"
 	table += "<th>Остановить</th>\n"
 	table += "</tr>\n"
@@ -167,10 +168,17 @@ func get_test_table(data [][]string) string {
 	table += "<tbody>\n"
 	for _, row := range data {
 		table += "<tr>\n"
+		i := 0
 		for _, col := range row {
-			table += "<td>" + col + "</td>\n"
+			i += 1
+			if i < 3 {
+				table += "<td>" + col + "</td>\n"
+			}
 		}
-		table += "<td><button class=\"l_btn\">Перезапустить</button></td>\n<td><button class=\"l_btn\">Остановить</button></td>"
+		table +=
+			"<td><button class=\"l_btn\" onclick=\"openNewTab('" + row[1] + "','" + row[0] + "')\">Открыть мониторинг</button></td>\n" +
+				"<td><button class=\"l_btn\">Перезапустить</button></td>\n" +
+				"<td><button class=\"l_btn\" onclick=\"window.location.href='http://ms-loadrtst038:9999/destroy?state=" + row[2] + "'\">Остановить</button></td>"
 		table += "</tr>\n"
 	}
 	table += "</tbody>\n"
@@ -356,6 +364,16 @@ func checkbox_all_projects() string {
 	return res
 }
 
+func checkbox_for_projects(projects []string) string {
+	res := "<div id=\"projectList\">"
+	for _, projectName := range projects {
+		res += "<input type=\"checkbox\" id=\"" + projectName + "\" name=\"projects\" value=\"" + projectName + "\">\n"
+		res += "<label for=\"" + projectName + "\">" + projectName + "</label><br>\n"
+	}
+	res += "</div>"
+	return res
+}
+
 func make_user_project_list() string {
 	logrus.Debug("make_user_project_list")
 	projects, _ := GetAllProjects()
@@ -417,4 +435,23 @@ func syncBuckets() string {
 	fmt.Println("syncBuckets Ответ: ", stringArray)
 	logrus.Debug("syncBuckets Ответ: ", stringArray)
 	return ""
+}
+
+func get_subs_by_username(UserName string) ([]string, string) {
+	var subs []string
+	var telNumber = ""
+	var err error
+	if UserName != "" {
+		telNumber, err = get_telnumber_by_username(UserName)
+		subs, err = get_subs_by_telnumber(telNumber)
+	} else {
+		logrus.Error("get_subs_by_tel ERROR username: ", UserName)
+		return nil, ""
+	}
+	if err != nil {
+		//fmt.Println("Error get_subs_by_username:", err)
+		logrus.Error("Error get_subs_by_username: ", err)
+		return nil, ""
+	}
+	return subs, telNumber
 }

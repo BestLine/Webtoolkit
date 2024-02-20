@@ -4,23 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/notifications.css">
-    <script src="/js/admin_subscription.js"></script>
-{{/*    <title>User Project Assignment</title>*/}}
+    <link rel="stylesheet" href="/css/subscription_page.css">
+{{/*    <script src="/js/admin_subscription.js"></script>*/}}
 </head>
 <body>
-
-<h1>Назначение подписок на уведомления для пользователей</h1>
-
-<form class="adm_subs" action="/assignProjects" method="post">
-    <label for="user">Выберите пользователя:</label>
-    {{  unescape .SelectUsers}}
-
-    <label>Выберите проекты:</label><br>
-    {{  unescape .SelectProjects}}
-    <br><br>
-
-    <input type="submit" value="Обновить подписки">
-</form>
+    <h1>Назначение подписок на уведомления для пользователя</h1>
+    <form class="adm_subs" action="/assignProjects" method="post">
+        <div>
+            <label for="phone">Номер телефона:</label>
+            <input type="tel" id="phone" name="phone" required pattern="^\+\d{11}$" value="{{unescape .TelNumber}}" title="Введите телефон в формате: +79ХХХХХХХХХ">
+        </div>
+        <div>
+            <label>Выберите проекты:</label>
+            <br>
+                {{  unescape .SelectProjects}}
+            <br>
+        </div>
+        <button type="submit">Обновить подписки</button>
+    </form>
 </body>
 <footer>
     <div class="error_message">cтатус</div>
