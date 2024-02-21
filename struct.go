@@ -314,6 +314,7 @@ type GitEnvData struct {
 		Key   string `json:"key"`
 		Value string `json:"value"`
 	} `json:"data"`
+	TestPlan []string `json:"testplan"`
 }
 
 type GitLabUrl struct {

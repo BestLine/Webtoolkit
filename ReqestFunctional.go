@@ -330,6 +330,7 @@ func startTestParseEnv(c *fiber.Ctx) error {
 			fiber.Map{"CurrentTests": "res"})
 	}
 	res := sendRequest(c, "Post3", viper.GetString("backend.test_starter")+url, c.Body())
+	logrus.Debug("startTestParseEnv res: ", string(res))
 	envs := new(GitEnvData)
 	if err := json.Unmarshal(res, envs); err != nil {
 		logrus.Error("startTestParseEnv Unmarshal error", err)
@@ -341,6 +342,7 @@ func startTestParseEnv(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 	fmt.Println("ENVS: ", envs.Data)
+	fmt.Println("gitUrl: ", gitUrl.Gitlab)
 	resp := "<form class=\"formTestStart\" id=\"TestStartForm\">\n"
 	resp += "<input class=\"back_button\" type=\"submit\" value=\"Назад\" onclick=\"goBack()\"/>\n"
 	resp += "<div class=\"Envs_top\" id=\"env\">\n"
@@ -365,12 +367,13 @@ func startTestParseEnv(c *fiber.Ctx) error {
 			"<div class=\"input_field\">\n " +
 			"<p class=\"area_label\">Выбор файла для запуска</p>\n " +
 			"<span>\n " +
-			"<select>" +
-			"<option>Module1</option>" +
-			"<option>Module2</option>" +
-			"</select>" +
-			"</span>\n " +
-			"</div>\n"
+			"<select>"
+	for _, item := range envs.TestPlan {
+		resp += "<option>" + item + "</option>"
+	}
+	resp += "</select>" +
+		"</span>\n " +
+		"</div>\n"
 	resp += "</div>\n"
 	resp += "<div class=\"Envs\" id=\"env\">\n"
 	for _, env := range envs.Data {

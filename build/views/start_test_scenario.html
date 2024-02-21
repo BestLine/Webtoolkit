@@ -1,0 +1,35 @@
+<form class="formTestStart" id="TestStartForm">
+    <input class="back_button" type="submit" value="Назад" onclick="goBack()"/>
+    <div class="Envs_top" id="env">
+        <div class="input_field">
+            <p class="area_label">GIT URL</p>
+            <span>
+			    <input type="text" class="GitUrl version" id="url" name="url" value="{{ gitUrl.Gitlab }}">
+			</span>
+        </div>
+        <div class="input_field left">
+            <p class="area_label">Количество генераторов</p>
+            <span>
+			    <i class="fa fa-clock"></i>
+			    <input type="number" class="genCount version" id="quantity" name="quantity" min="1" max="10" value="1" required>
+			</span>
+        </div>
+        <div class="input_field">
+            <p class="area_label">Аппаратная конфигурация</p>
+            <span>{{ generators_list }}</span>
+        </div>
+        <div class="input_field">
+            <p class="area_label">Выбор файла для запуска</p>
+            <span>
+			    <select>
+			        <option>Module1</option>
+			        <option>Module2</option>
+			    </select>
+			</span>
+        </div>
+    </div>
+    <div class="Envs" id="env">
+        {{ Envs}}
+    </div>
+    <input class="submit_button" type="submit" value="Запустить" onclick="startTest()"/>
+</form>
