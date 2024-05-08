@@ -17,34 +17,8 @@
     </div>
     <div class="settings_project right">
         <div class="option">
-            <p class="area_label">Привязка корневой страницы конфлюенс</p>
-            <input type="number" id="confl_page_url" placeholder="Введите адрес страницы" required>
-            <button class="l_btn" id="btn_set_confl_page" formaction="submit">Привязать страницу</button>
-        </div>
-        <div class="option">
-            <p class="area_label">Создание нового бакета</p>
-            <input type="text" id="new_bucket_name" placeholder="Введите имя нового бакета" required>
-            <select class='host field' id="settings_host">
-                {{ unescape .HostList}}
-            </select>
-            <button class="l_btn" id="btn_create_new_bucket" formaction="submit">Создать бакет</button>
-        </div>
-        <div class="option">
-            <p class="area_label">Привязка методики</p>
-            <input class="page" type="number" id="set_methodic_page" placeholder="Введите адрес страницы" required>
-            <select required class='version field' id="settings_version_list">
-                {{ unescape .Versions}}
-            </select>
-            <button class="l_btn" id="btn_set_methodic" formaction="submit">Привязать методику</button>
-        </div>
-        <div class="option">
-            <p class="area_label">Добавление версии</p>
-            <form class="adm_c_project" action="/submit" method="post">
-                <input type="text" id="set_version" placeholder="Введите новую версию" required>
-                <button class="l_btn" id="btn_set_version" type="submit">Создать новую версию</button>
-            </form>
-        </div>
 
+        </div>
     </div>
     <h1 class="msg"></h1>
 </div>

@@ -17,11 +17,7 @@ func startPage(c *fiber.Ctx) error {
 
 func getMainPage(c *fiber.Ctx) error {
 	logrus.Debug("getMainPage")
-	return c.Render("index",
-		fiber.Map{"Table_reports": get_last_10_reports_table(GetTableDataReports(c, "", 10)),
-			"Table_tests":  GetCurrentTests(c),
-			"Table_status": "get_status_table(GetTableDataStatus(c))",
-		})
+	return c.Render("index", fiber.Map{})
 }
 
 func GetProjectBuckets(c *fiber.Ctx) error {
@@ -194,11 +190,13 @@ func getAdminSubscription(c *fiber.Ctx) error {
 	}
 }
 
-func getCurrentTests(c *fiber.Ctx) error {
-	logrus.Debug("getCurrentTests")
-	res := GetCurrentTests(c)
-	return c.Render("current_tests",
-		fiber.Map{"CurrentTests": res})
+func getTests(c *fiber.Ctx) error {
+	// реализация таблицы тестов
+	logrus.Debug("getTests")
+	//res := GetCurrentTests(c)
+	return c.Render("show_tests",
+		fiber.Map{"Table": "<tr><td>123</td>\n<td>124</td>\n<td>123</td>\n<td>123</td>\n<td>123</td></tr>" +
+			"<tr><td>125</td><td>126</td><td>127</td><td>128</td><td>129</td></tr>"})
 }
 
 func testView(c *fiber.Ctx) error {

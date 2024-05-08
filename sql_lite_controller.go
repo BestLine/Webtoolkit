@@ -470,17 +470,6 @@ func AddProjectBucket(BucketName string, BucketUrl string, ProjectName string) e
 	//TODO: new feature
 }
 
-func AddProjectRootPage(PageId int, ProjectName string) error {
-	Query := "INSERT OR IGNORE INTO project_root_page (project_id, page_id) SELECT p.id, ? FROM projects p WHERE p.project_name = ?;"
-	logrus.Debug("QW = ", Query, " ProjectName=", ProjectName, " PageId=", PageId)
-	_, err := db.Exec(Query, PageId, ProjectName)
-	if err != nil {
-		return err
-	}
-	return nil
-	//TODO: new feature
-}
-
 func AddUserSubscriptions(UserName string, Projects []string) error {
 	Query := `DELETE FROM user_subscriptions
 		WHERE user_id = (SELECT user_id FROM users WHERE username = ?)

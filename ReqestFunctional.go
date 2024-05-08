@@ -7,7 +7,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"strconv"
 	"strings"
 )
 
@@ -31,63 +30,6 @@ func getReportHistory(c *fiber.Ctx) error {
 		fiber.Map{"Table_reports": get_last_10_reports_table(GetTableDataReports(c, activeProject, 0))})
 }
 
-func getTestHistory(c *fiber.Ctx) error {
-	logrus.Debug("getTestHistory")
-	value := c.Locals("user")
-	claims, ok := (value).(*jwt.MapClaims)
-	username, ok := (*claims)["username"].(string)
-	activeProject, err := GetUserActiveProject(username)
-	if !ok {
-		// Обработка ошибки преобразования
-		logrus.Error("getSettings: username conversion failed")
-		return fmt.Errorf("username conversion failed")
-	}
-	if err != nil {
-		logrus.Error(err)
-	}
-	return c.Render("test_history",
-		fiber.Map{"Table_reports": get_last_10_reports_table(GetTableDataReports(c, activeProject, 0))})
-}
-
-func addMethodic(c *fiber.Ctx) error {
-	logrus.Debug("addMethodic")
-	value := c.Locals("user")
-	claims, _ := (value).(*jwt.MapClaims)
-	username, _ := (*claims)["username"].(string)
-	activeProject, err := GetUserActiveProject(username)
-	methodic := new(MethodicSet)
-	if err = c.BodyParser(methodic); err != nil {
-		logrus.Error("addMethodic parse ERROR: ", err)
-		return err
-	}
-	page, err := strconv.Atoi(methodic.Page)
-	err = AddProjectMethodic(page, methodic.Version, activeProject)
-	if err != nil {
-		logrus.Error("addMethodic ERROR: ", err)
-		return err
-	}
-	return c.JSON("OK")
-}
-
-func addVersion(c *fiber.Ctx) error {
-	logrus.Debug("addVersion")
-	value := c.Locals("user")
-	claims, _ := (value).(*jwt.MapClaims)
-	username, _ := (*claims)["username"].(string)
-	activeProject, err := GetUserActiveProject(username)
-	version := new(Version)
-	if err = c.BodyParser(version); err != nil {
-		logrus.Error(err)
-		return err
-	}
-	err = AddProjectVersion(version.Value, activeProject)
-	if err != nil {
-		logrus.Error("addVersion ERROR: ", err)
-		return err
-	}
-	return c.SendString("OK")
-}
-
 func getVersion(c *fiber.Ctx) error {
 	logrus.Debug("getVersion")
 	value := c.Locals("user")
@@ -99,28 +41,6 @@ func getVersion(c *fiber.Ctx) error {
 		logrus.Error("getVersion ERROR: ", err)
 	}
 	return c.JSON(res)
-}
-
-func createBucket(c *fiber.Ctx) error {
-	logrus.Debug("postCreateBucket!")
-	//TODO: ГОВНА ПИРОГА!!!!
-	value := c.Locals("user")
-	claims, _ := (value).(*jwt.MapClaims)
-	username, _ := (*claims)["username"].(string)
-	logrus.Debug("username = ", username)
-
-	newBucket := new(NewBucket)
-	if err := c.BodyParser(newBucket); err != nil {
-		logrus.Error(err)
-		return err
-	}
-	activeProject, err := GetUserActiveProject(username)
-	err = AddProjectBucket(newBucket.Bucket, newBucket.Host, activeProject)
-	if err != nil {
-		logrus.Error("createBucket ERROR: ", err)
-		return err
-	}
-	return c.SendString("OK")
 }
 
 func addDataForBeeLoad(c *fiber.Ctx) error {
@@ -185,28 +105,6 @@ func addProject(c *fiber.Ctx) error {
 		return err
 	}
 	return c.SendString("OK")
-}
-
-func addConflPage(c *fiber.Ctx) error {
-	logrus.Debug("addConflPage")
-	value := c.Locals("user")
-	claims, _ := (value).(*jwt.MapClaims)
-	username, _ := (*claims)["username"].(string)
-	logrus.Debug("username = ", username)
-
-	page := new(NewRootPage)
-	if err := c.BodyParser(page); err != nil {
-		logrus.Error("addConflPage parse ERROR: ", err)
-		return err
-	}
-	activeProject, err := GetUserActiveProject(username)
-	int_page, err := strconv.Atoi(page.Page)
-	err = AddProjectRootPage(int_page, activeProject)
-	if err != nil {
-		logrus.Error("addConflPage ERROR: ", err)
-		return err
-	}
-	return c.JSON("OK")
 }
 
 func addUserToProject(c *fiber.Ctx) error {
@@ -367,7 +265,7 @@ func startTestParseEnv(c *fiber.Ctx) error {
 			"<div class=\"input_field\">\n " +
 			"<p class=\"area_label\">Выбор файла для запуска</p>\n " +
 			"<span>\n " +
-			"<select>"
+			"<select class=\"fileName\" name=\"filename\">"
 	for _, item := range envs.TestPlan {
 		resp += "<option>" + item + "</option>"
 	}

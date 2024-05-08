@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 func GetTableDataReports(c *fiber.Ctx, project string, count int) TestsTableData {
@@ -25,20 +24,6 @@ func GetTableDataReports(c *fiber.Ctx, project string, count int) TestsTableData
 	//res := sendGet(c, url)
 	res := sendRequest(c, "Get", url)
 	json.Unmarshal(res, &data)
-	return data
-}
-
-func GetTableDataTests(c *fiber.Ctx) CurrentTestsTableData {
-	logrus.Debug("GetTableDataTests")
-	url := "/beeload/get/tableDataTests"
-	//res := sendGet(c, url)
-	var data CurrentTestsTableData
-	logrus.Debug("url: ", url)
-	res := sendRequest(c, "Get", url)
-	err := json.Unmarshal(res, &data)
-	if err != nil {
-		return CurrentTestsTableData{}
-	}
 	return data
 }
 
@@ -101,57 +86,6 @@ func GetCurrentTests(c *fiber.Ctx) string {
 	}
 
 	return get_test_table(result)
-}
-
-func get_status_table(data [][]string) string {
-	table := "<table>\n"
-	table += "<thead>\n"
-	table += "<tr>\n"
-	table += "<th>Система</th>\n"
-	table += "<th>Последняя проверка</th>\n"
-	table += "<th>Статус</th>\n"
-	table += "</tr>\n"
-	table += "</thead>\n"
-	table += "<tbody>\n"
-	for _, row := range data {
-		table += "<tr>\n"
-		for _, col := range row {
-			table += "<td>" + col + "</td>\n"
-		}
-		table += "</tr>\n"
-	}
-	table += "</tbody>\n"
-	table += "</table>\n"
-	return table
-}
-
-func GetTableDataStatus(c *fiber.Ctx) [][]string {
-	logrus.Debug("GetTableDataStatus")
-	url := "/beeload/get/tableDataStatus"
-	//res := sendGet(c, url)
-	res := sendRequest(c, "Get", url)
-	//fmt.Println(res)
-	// расшифровка ответа
-	dataStr := string(res)
-
-	// Разбиваем на строки
-	rows := strings.Split(dataStr, "},{")
-
-	// Подготовка для парсинга
-	var data [][]string
-	for _, row := range rows {
-		// Удаление лишних символов
-		row = strings.Trim(row, "[{]}")
-		// Разбиваем на элементы
-		items := strings.Split(row, ",")
-		var itemStrings []string
-		for _, item := range items {
-			item = strings.Trim(item, "\" ")
-			itemStrings = append(itemStrings, item)
-		}
-		data = append(data, itemStrings)
-	}
-	return data
 }
 
 func get_test_table(data [][]string) string {
@@ -329,28 +263,6 @@ func RespToByteReader(response *http.Response) []byte {
 		buf = append(buf, chunk[:n]...)
 	}
 	return buf
-}
-
-func select_all_users() string {
-	logrus.Debug("select_all_users")
-	users, _ := GetAllUsers()
-	res := "<select name=\"user\" class=\"user\" required><option value=\"\" disabled selected>Выберите пользователя</option>"
-	for _, userName := range users {
-		res += "<option value=\"" + userName + "\">" + userName + "</option>"
-	}
-	res += "</select>"
-	return res
-}
-
-func select_all_projects() string {
-	logrus.Debug("select_all_users")
-	projects, _ := GetAllProjects()
-	res := "<select class=\"project_options\" name=\"project\" required><option value=\"\" disabled selected>Выберите проект</option>"
-	for _, projectName := range projects {
-		res += "<option value=\"" + projectName + "\">" + projectName + "</option>"
-	}
-	res += "</select>"
-	return res
 }
 
 func checkbox_all_projects() string {

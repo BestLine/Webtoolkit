@@ -16,7 +16,9 @@ table {
 table td,table th {
     padding: 7px;
     border: 0;
-    border-top: 3px solid #fff
+    border-top: 3px solid #fff;
+    cursor: pointer;
+
 }
 
 table th {

@@ -19,9 +19,7 @@ func InitLogger(debug bool, level string, filename string) {
 		FullTimestamp: true, // Отобразить полное время записи лога
 	})
 	logrus.SetOutput(logRotation)
-
 	p_level, err := logrus.ParseLevel(level)
-
 	logrus.SetLevel(p_level)
 
 	if err != nil {

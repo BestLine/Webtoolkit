@@ -1,6 +1,7 @@
 // ---------Responsive-navbar-active-animation-----------
 function test(){
 	const buttons = document.querySelectorAll('.l_btn');
+	let wrapper = $( "#wrapper" )
 	$("#navbarSupportedContent").off("click").on("click","li",function(e){
 		if (e.target.textContent!=="Выход") {
 			$('#navbarSupportedContent ul li').removeClass("active");
@@ -9,23 +10,19 @@ function test(){
 			toggleNavbarLeft(e)
 		}
 		if (e.target.textContent==="Главная"){
-			$( "#wrapper" ).load( "/main_page", function(responseText, textStatus) {
+			wrapper.html("")
+			wrapper.load( "/main_page", function(responseText, textStatus) {
 				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+					show_error()
 				}
 			});
 		} else if (e.target.textContent === "Управление отчётами") {
 			buttons.forEach(btn => btn.classList.remove('active'));
 			e.target.classList.add('active');
-			$( "#wrapper" ).load( "/make_report", function(responseText, textStatus) {
+			wrapper.html("")
+			wrapper.load( "/make_report", function(responseText, textStatus) {
 				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+					show_error()
 					}
 				document.querySelector('.formWithValidation').addEventListener('submit', handleMakeReport)
 				document.querySelector('.EndTime').addEventListener('change', checkTime)
@@ -42,30 +39,26 @@ function test(){
 				});
 			})
 		} else if (e.target.textContent === "Управление тестами") {
-			$( "#wrapper" ).load( "/current_tests", function(responseText, textStatus) {
+			wrapper.html("")
+			wrapper.load( "/tests", function(responseText, textStatus) {
 				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+					show_error()
 				}
 				// document.querySelector('.formWithValidation').addEventListener('submit', handleCreateBucket)
 			});
 		} else if (e.target.textContent === "Настройки проектов") {
-			$("#wrapper").load("/settings", function(responseText, textStatus) {
+			wrapper.html("")
+			wrapper.load("/settings", function(responseText, textStatus) {
 				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+					show_error()
 				}
-				updateDataPage(event, "versions")
+				// updateDataPage(event, "versions")
 				updateDataPage(event, "hosts")
 				document.getElementById("btn_set_project").addEventListener('click', setActiveProject) // rabotaet
-				document.getElementById("btn_set_methodic").addEventListener('click', handleMetodicSet) // rabotaet
-				document.getElementById("btn_set_version").addEventListener('click', handleVersionAdd) // rabotaet
-				document.getElementById("btn_create_new_bucket").addEventListener('click', handleCreateBucket) // rabotaet
-				document.getElementById("btn_set_confl_page").addEventListener('click', handleConflPageAdd)
+				// document.getElementById("btn_set_methodic").addEventListener('click', handleMetodicSet) // rabotaet
+				// document.getElementById("btn_set_version").addEventListener('click', handleVersionAdd) // rabotaet
+				// document.getElementById("btn_create_new_bucket").addEventListener('click', handleCreateBucket) // rabotaet
+				// document.getElementById("btn_set_confl_page").addEventListener('click', handleConflPageAdd)
 
 				// document.getElementById("settings_version_list").addEventListener('change', updateListVersions)
 
@@ -73,6 +66,12 @@ function test(){
 		}
 	setTimeout(function() {anim(); }, 200);
 	});
+}
+
+function show_error() {
+	$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
+		"color: red; " +
+		"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
 }
 
 function anim(e) {
@@ -95,25 +94,22 @@ function NavbarLeftHandler() {
 	const buttons = document.querySelectorAll('.l_btn');
 	$('#navbarLeft').off("click").on("click",function(e) {
 		let button_text = e.target.textContent
+		let wrapper = $( "#wrapper" )
 		console.log(button_text);
 		buttons.forEach(btn => btn.classList.remove('active'));
 		e.target.classList.add('active');
 		///////////// Управление отчётами /////////////
 		if (button_text === "История отчётов") {
-			$( "#wrapper" ).load( "/report_history", function(responseText, textStatus) {
+			wrapper.html("")
+			wrapper.load( "/report_history", function(responseText, textStatus) {
 				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+					show_error()
 				}})
 		} else if (button_text === "Создать отчёт") {
-			$( "#wrapper" ).load( "/make_report", function(responseText, textStatus) {
+			wrapper.html("")
+			wrapper.load( "/make_report", function(responseText, textStatus) {
 				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+					show_error()
 				}
 				document.querySelector('.formWithValidation').addEventListener('submit', handleMakeReport)
 				document.querySelector('.proj').addEventListener("change", function(event) {
@@ -122,12 +118,10 @@ function NavbarLeftHandler() {
 				});
 			})
 		}  else if (button_text === "Сравнение тестов") {
-			$( "#wrapper" ).load( "/compare_release", function(responseText, textStatus) {
+			wrapper.html("")
+			wrapper.load( "/compare_release", function(responseText, textStatus) {
 				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+					show_error()
 				}
 				document.querySelector('.formWithValidation').addEventListener('submit', handleCompareRelease)
 				document.querySelector('.bucke').addEventListener("change", function(event) {
@@ -137,29 +131,17 @@ function NavbarLeftHandler() {
 			})
 		}
 		///////////// Управление тестами /////////////
-		else if (button_text === "История тестов") {
-			$( "#wrapper" ).load( "/test_history", function(responseText, textStatus) {
+		else if (button_text === "Тесты") {
+			wrapper.html("")
+			wrapper.load( "/tests", function(responseText, textStatus) {
 				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
-				}})
-		} else if (button_text === "Текущие тесты") {
-			$( "#wrapper" ).load( "/current_tests", function(responseText, textStatus) {
-				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+					show_error()
 				}})
 		} else if (button_text === "Запустить тест") {
-			$( "#wrapper" ).load( "/start_test", function(responseText, textStatus) {
+			wrapper.html("")
+			wrapper.load( "/start_test", function(responseText, textStatus) {
 				if (textStatus === "error") {
-					// В случае ошибки загрузки, выводим сообщение
-					$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-						"color: red; " +
-						"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+					show_error()
 				} else {
 					// document.querySelector('.formWithValidation').addEventListener('submit', handleStartTestParseEnv)
 				}
@@ -180,8 +162,8 @@ function toggleNavbarLeft(e) {
 				'<button class="l_btn active">Создать отчёт</button>' +
 				'<button class="l_btn">Сравнение тестов</button>';
 		} else if (e.target.textContent === 'Управление тестами') {
-			newButtons = '<button class="l_btn">История тестов</button>' +
-				'<button class="l_btn active">Текущие тесты</button>' +
+			newButtons =
+				'<button class="l_btn active">Тесты</button>' +
 				'<button class="l_btn">Запустить тест</button>';
 		}
 
@@ -189,7 +171,6 @@ function toggleNavbarLeft(e) {
 		if (!navbarLeft.classList.contains('show')) {
 			navbarLeft.classList.add('show'); // Добавляем класс 'show' для показа блока с анимацией
 		}
-		console.log("TEST");
 		NavbarLeftHandler();
 	} else {
 		navbarLeft.classList.remove('show');
@@ -274,10 +255,7 @@ function handleCompareRelease(event) {
 function goBack() {
 	$( "#wrapper" ).load( "/start_test", function(responseText, textStatus) {
 		if (textStatus === "error") {
-			// В случае ошибки загрузки, выводим сообщение
-			$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-				"color: red; " +
-				"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+			show_error()
 		} else {
 			document.querySelector('.formWithValidation').addEventListener('click', handleStartTestParseEnv)
 		}
@@ -289,6 +267,7 @@ function startTest() {
 	let gitlab = document.getElementById('url').value;
 	let count = parseInt(document.getElementById('quantity').value, 10);
 	let resource = document.getElementsByName('generator')[0].value;
+	let filename = document.getElementsByName('filename')[0].value;
 
 	let envsData = [];
 	let envFields = document.querySelectorAll('.Envs div');
@@ -303,7 +282,8 @@ function startTest() {
 		gitlab: gitlab,
 		count: count,
 		resource: resource,
-		data: envsData
+		data: envsData,
+		testplan: filename
 	};
 
 	console.log("startTest JSON: ", JSON.stringify(data))
@@ -311,7 +291,6 @@ function startTest() {
 }
 
 function handleStartTestParseEnv(event, scenario) {
-	//TODO: здесь мы делаем отправку гит ссылки и отрисовку переменных
 	console.log("handleStartTestParseEnv scenario: ", scenario)
 	let form = document.querySelector('.formWithValidation')
 	let git_url = form.querySelector('.gitUrl')
@@ -319,10 +298,6 @@ function handleStartTestParseEnv(event, scenario) {
 	let url = ''
 	event.preventDefault()
 	data["gitlab"] = git_url.value
-	//TODO:  здесб нужно сделать отправку одной из двух форм в зависимости от выбранной кнопки
-	//TODO:  здесб нужно сделать отправку одной из двух форм в зависимости от выбранной кнопки
-	//TODO:  здесб нужно сделать отправку одной из двух форм в зависимости от выбранной кнопки
-	//TODO:  здесб нужно сделать отправку одной из двух форм в зависимости от выбранной кнопки
 	console.log("handleStartTestParseEnv JSON: ", JSON.stringify(data))
 	if (scenario===true) {
 		url = '/parse/env'
@@ -360,70 +335,12 @@ function handleStartTest(event) {
 	send_request_with_notification(data, "/beeload/test/create", "Статус: Запрос на запуск теста отправлен")
 }
 
-function handleMetodicSet(event) {
-	let form = document.querySelector('.settings_page');
-	let bucket = form.querySelector('.bucket');
-	let page = form.querySelector('.page');
-	let version = form.querySelector('.version');
-	let data = {};
-	event.preventDefault();
-	let pageNumber = page.value.replace(/\D/g, ''); // Оставляет только цифры
-	page.value = pageNumber;
-	data["bucket"] = bucket.value;
-	data["version"] = version.value;
-	data["page"] = page.value;
-	console.log("JSON: ", JSON.stringify(data));
-	send_request_with_notification(data, "/beeload/add/methodic", "Статус: Методика привязана")
-	//TODO: Реализация
-}
-
-function handleVersionAdd(event) {
-	let form = document.querySelector('.settings_page')
-	let version = form.querySelector('#set_version')
-	let data = {};
-	event.preventDefault()
-	data["version"] = version.value
-	console.log("JSON: ", JSON.stringify(data))
-	send_request_with_notification(data, "/beeload/add/version", "Статус: Новая версия создана")
-	updateDataPage(event, "versions")
-}
-
-function handleConflPageAdd(event) {
-	let form = document.querySelector('.settings_page')
-	let page = form.querySelector('#confl_page_url')
-	let data = {};
-	event.preventDefault()
-	data["page"] = page.value
-	console.log("JSON: ", JSON.stringify(data))
-	send_request_with_notification(data, "/beeload/add/confl_page", "Статус: Новая страница привязана")
-}
-
-function handleSetReportHomepage(event) {
-	let form = document.querySelector('.formWithValidation')
-	let project = form.querySelector('.page')
-	let bucket = form.querySelector('.bucket')
-	let xhr = new XMLHttpRequest();
-	let data = {};
-	event.preventDefault()
-	data["id"] =  parseInt(project.value)
-	data["bucket"] = bucket.value
-	console.log("JSON: ", JSON.stringify(data))
-	xhr.open("POST", "/beeload/add/home", true);
-	xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-	xhr.onreadystatechange = function (message) {
-		var responceMsg = document.querySelector('.error_message');
-		var anim_border = document.querySelector('.form_wrapper');
-	}
-	xhr.send(JSON.stringify(data));
-}
-
 function setActiveProject(event) {
 	var select = document.getElementById("settings_activeproject");
 	var selectedValue = select.options[select.selectedIndex].value;
 	let msg = document.querySelector('.error_message')
 	let xhr = new XMLHttpRequest();
 	let data = {};
-	updateDataPage(event, "versions")
 	data["project_name"] = selectedValue
 	send_request_with_notification(data, "/beeload/set/project", "Выбран проект: " + selectedValue)
 }
@@ -478,19 +395,6 @@ function send_request_with_notification(data, url, message) {
 		}
 	});
 	xhr.send(JSON.stringify(data));
-}
-
-function handleCreateBucket(event) {
-	event.preventDefault();
-	let host =document.querySelector('#settings_host')
-	let bucket = document.querySelector('#new_bucket_name');
-	console.log("handleCreateBucket")
-	let data = {};
-	event.preventDefault()
-	data["host"] = host.value
-	data["bucket"] = bucket.value
-	console.log("JSON: ", JSON.stringify(data))
-	send_request_with_notification(data, "/beeload/create/bucket", "Статус: Новый бакет " + data["bucket"] + " создан")
 }
 
 function handleCompare(event) {
@@ -559,20 +463,17 @@ function openNewTab(project, test) {
 $(document).ready(function(){
 	$("#wrapper").load("/main_page", function(responseText, textStatus, jqXHR) {
 		if (textStatus === "error") {
-			// В случае ошибки загрузки, выводим сообщение
-			$("#wrapper").html("<div class=\"main_page\" style=\"text-align: center; " +
-				"color: red; " +
-				"font-size: 20px;\">Ошибка при загрузке содержимого. Сервер недоступен.</div>");
+			show_error()
 		}
 	});
-	setTimeout(function() {anim(); }, 200);
-	setTimeout(function(){ test(); }, 100);
+	setTimeout(function() {anim();}, 200);
+	setTimeout(function(){test();}, 100);
 	$(window).on('resize', function() {
-		setTimeout(function(){ anim(); }, 500);
+		setTimeout(function(){anim();}, 500);
 	});
 	$(".navbar-toggler").click(function(){
 		$(".navbar-collapse").slideToggle(300);
-		setTimeout(function(){ test(); });
+		setTimeout(function(){test();});
 	});
 });
 

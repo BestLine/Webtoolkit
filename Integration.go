@@ -31,7 +31,6 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 		case string:
 			strArgs = append(strArgs, v)
 		}
-		//fmt.Printf("Type: %T, Value: %v\n", arg, arg)
 	}
 	targetURL := viper.GetString("backend.pure_host") + strArgs[1]
 	if strArgs[0] == "Get" {
