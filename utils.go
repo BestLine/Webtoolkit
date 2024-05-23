@@ -304,7 +304,7 @@ func make_user_project_list() string {
 
 func make_generators_list() string {
 	logrus.Debug("make_generators_list")
-	res := "<select name=\"generator\" class=\"genType\" required><option value=\"\" disabled selected>Выберите Генератор</option>"
+	res := "<select name=\"generator\" class=\"genType\" required><option value=\"\" disabled selected hidden>Выберите Генератор</option>"
 	generators := "<option value=\"cpu2ram4\">cpu2ram4</option>" +
 		"<option value=\"cpu4ram8\">cpu4ram8</option>" +
 		"<option value=\"cpu8ram16\">cpu8ram16</option>"

@@ -4,6 +4,36 @@ type Project struct {
 	Name string `json:"project"`
 }
 
+type TestStatus struct {
+	Status      int         `json:"status"`
+	State       string      `json:"state"`
+	TestData    TestData2   `json:"test_data"`
+	RequestData RequestData `json:"request_data"`
+}
+
+type RequestData struct {
+	Gitlab   string `json:"gitlab"`
+	Count    int    `json:"count"`
+	Resource string `json:"resource"`
+	Data     []Data `json:"data"`
+	Testplan string `json:"testplan"`
+}
+
+type Data struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+type TestData2 struct {
+	ConfID      int    `json:"conf_id"`
+	Application string `json:"application"`
+	Bucket      string `json:"bucket"`
+	Delivery    string `json:"delivery"`
+	Type        string `json:"type"`
+	TimeStart   int64  `json:"time_start"`
+	TimeEnd     int64  `json:"time_end"`
+}
+
 type UserProject struct {
 	User    string `json:"user"`
 	Project string `json:"project"`

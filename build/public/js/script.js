@@ -264,6 +264,7 @@ function goBack() {
 
 function startTest() {
 	event.preventDefault()
+	let form = document.getElementById('TestStartForm');
 	let gitlab = document.getElementById('url').value;
 	let count = parseInt(document.getElementById('quantity').value, 10);
 	let resource = document.getElementsByName('generator')[0].value;
@@ -271,6 +272,11 @@ function startTest() {
 
 	let envsData = [];
 	let envFields = document.querySelectorAll('.Envs div');
+
+	if (!form.checkValidity()) {
+		form.reportValidity();
+		return;
+	}
 
 	envFields.forEach(function(envField) {
 		let key = envField.querySelector('.area_label').textContent.toLowerCase();
@@ -313,9 +319,6 @@ function handleStartTestParseEnv(event, scenario) {
 }
 
 function handleStartTest(event) {
-	//TODO: надо переделать обработку в соответствии с парсингом окружения
-	//TODO: надо переделать обработку в соответствии с парсингом окружения
-	//TODO: надо переделать обработку в соответствии с парсингом окружения
 	let form = document.querySelector('.formWithValidation')
 	let git_url = form.querySelector('.gitUrl')
 	let count = form.querySelector('.genCount')
