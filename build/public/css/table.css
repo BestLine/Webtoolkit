@@ -1,6 +1,30 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 
-table {
+.test {
+    height: 600px;
+    overflow-x: scroll !important;
+
+}
+
+.tests {
+    border: 1px solid #dddddd;
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+
+}
+
+.tests td,.tests th {
+    border: 1px solid #dddddd;
+
+    width: 10%;
+    padding: 7px;
+    border-top: 3px solid #fff;
+    cursor: pointer;
+
+}
+
+.test-table {
     width: 80%;
     margin-left: 13%;
     margin-top: 20px;
@@ -14,7 +38,7 @@ table {
     background: #fff!important
 }
 
-table td,table th {
+.test-table td,.test-table th {
     padding: 7px;
     border: 0;
     border-top: 3px solid #fff;
@@ -22,7 +46,8 @@ table td,table th {
 
 }
 
-table th {
+.test-table th {
+    width: 10%;
     font-weight: 700;
     background: #ffd518;
     text-align: left;
@@ -30,14 +55,14 @@ table th {
     border-bottom: 3px solid #ffd518
 }
 
-table td {
+.test-table td {
     border-bottom: 3px solid #fff;
     font-size: 12px;
     border-left: 1px solid #ddd;
     border-right: 1px solid #ddd
 }
 
-table tbody tr:nth-child(even) {
+.test-table tbody tr:nth-child(even) {
     background: #f8f8f8!important
 }
 
@@ -79,4 +104,33 @@ table tbody tr:nth-child(even) {
     background: #ffdd45;
     cursor: default;
     color: #2a2a2a !important;
+}
+
+details {
+    width: 80%;
+    margin-left: 13%; !important;
+    border: 5px solid #fff;
+    border-top: 5px solid #fff;
+    border-bottom: 3px solid #fff;
+    border-collapse: collapse;
+    outline: 3px solid #ffd518;
+    font-size: 12px;
+    background: #fff!important
+}
+
+summary {
+    justify-content: center;
+    display: flex;
+}
+
+.tableButton {
+    margin: 10px;
+    width: 32%;
+    border-radius: 3px;
+}
+
+.tableButtonsBlock {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
 }

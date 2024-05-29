@@ -162,6 +162,7 @@ func registerUser(username, password, email string, roles []string) error {
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE username = ?", username).Scan(&count)
 	if err != nil {
+		logrus.Error("registerUser: Проверка на существование")
 		return err
 	}
 
@@ -172,12 +173,14 @@ func registerUser(username, password, email string, roles []string) error {
 	// Сохраняем данные нового пользователя в таблице users
 	result, err := db.Exec("INSERT INTO users (username, password, email) VALUES (?, ?, ?)", username, password, email)
 	if err != nil {
+		logrus.Error("registerUser: Сохранение пользователя")
 		return err
 	}
 
 	// Получаем ID нового пользователя
 	userID, err := result.LastInsertId()
 	if err != nil {
+		logrus.Error("registerUser: Получение ID")
 		return err
 	}
 
@@ -187,6 +190,7 @@ func registerUser(username, password, email string, roles []string) error {
 		var roleID int
 		err := db.QueryRow("SELECT id FROM roles WHERE name = ?", roleName).Scan(&roleID)
 		if err != nil {
+			logrus.Error("registerUser: Получение ID роли")
 			return err
 		}
 		roleIDs = append(roleIDs, roleID)
@@ -196,10 +200,20 @@ func registerUser(username, password, email string, roles []string) error {
 	for _, roleID := range roleIDs {
 		_, err := db.Exec("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)", userID, roleID)
 		if err != nil {
+			logrus.Error("registerUser: Сохранение связей")
 			return err
 		}
 	}
 
+	return nil
+}
+
+func addRole(role string) error {
+	_, err := db.Exec("INSERT INTO roles (name) VALUES (?)", role)
+	if err != nil {
+		logrus.Error("addRole: Добавление роли")
+		return err
+	}
 	return nil
 }
 

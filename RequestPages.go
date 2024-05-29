@@ -6,6 +6,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
 //Здесь находятся запросы которые реализуют отрисовку страниц в браузере
@@ -208,13 +209,67 @@ func getTests(c *fiber.Ctx) error {
 	}
 
 	for _, status := range testStatuses {
-		html += "<tr>\n"
-		html += fmt.Sprintf("<td>%s</td>\n", status.TestData.Bucket)
-		html += fmt.Sprintf("<td>%s</td>\n", status.TestData.Delivery)
-		html += fmt.Sprintf("<td>%s</td>\n", status.TestData.Type)
-		html += fmt.Sprintf("<td>%s</td>\n", status.TestData.Application)
-		html += fmt.Sprintf("<td>%d</td>\n", status.Status)
-		html += "</tr>\n"
+		if status.Status == 777 {
+			html += fmt.Sprintf("<details class=\"test-details\">"+
+				"<summary>Тест запустился с ошибкой</summary>"+
+				"%s</details>\n", status.RequestData.Gitlab)
+		} else if status.Status == 0 {
+			html += fmt.Sprintf("<details class=\"test-details\">" +
+				"<summary>Тест был запущен из другого источника</summary>" +
+				"</details>\n")
+		} else {
+			t1 := time.Unix(status.TestData.TimeStart, 0)
+			t2 := time.Unix(status.TestData.TimeEnd, 0)
+			html += fmt.Sprintf("<details class=\"test-details\">"+
+				"<summary>"+
+				"<table class=\"tests\">"+
+				"<tbody>"+
+				"<tr>"+
+				"<td>%s</td>"+
+				"<td>%s</td>"+
+				"<td>%s</td>"+
+				"<td>%s</td>"+
+				"<td>%d</td>"+
+				"</tr>"+
+				"</tbody>"+
+				"</table>"+
+				"</summary>", status.TestData.Bucket, t1.Format(time.RFC3339), status.TestData.Type, status.TestData.Application, status.Status)
+			i := 0
+			html += "<table class=\"tests\">"
+			html += "<tbody>"
+			html += "<tr>"
+			html += fmt.Sprintf("<td>Type = %s</td>", status.TestData.Type)
+			html += fmt.Sprintf("<td>TimeStart = %s</td>", t1.Format(time.RFC3339))
+			html += fmt.Sprintf("<td>TimeEnd = %s</td>", t2.Format(time.RFC3339))
+			html += fmt.Sprintf("<td>Bucket = %s</td>", status.TestData.Bucket)
+			html += fmt.Sprintf("<td>Application = %s</td>", status.TestData.Application)
+			html += "</tr>"
+			html += "<tr>"
+			html += fmt.Sprintf("<td>ConfID = %d</td>", status.TestData.ConfID)
+			html += fmt.Sprintf("<td>Delivery = %s</td>", status.TestData.Delivery)
+			html += "</tr>"
+			for _, item := range status.RequestData.Data {
+				//println("tag: ", item.Key, "  -  ", item.Value)
+				i += 1
+				if i%5 == 0 {
+					html += "<tr>"
+				}
+				html += fmt.Sprintf("<td>%s = %s</td>", item.Key, item.Value)
+				if i%5 == 0 {
+					html += "</tr>"
+					i = 0
+				}
+			}
+			html += "</table>"
+			html += "</tbody>"
+			html += "<div class=\"tableButtonsBlock\">"
+
+			html += "<button class=\"tableButton\">Restart</button>"
+			html += "<button class=\"tableButton\">Stop</button>"
+			html += "<button class=\"tableButton\" onclick=\"openNewTab('" + status.TestData.Bucket + "','" + status.TestData.Application + "')\">Grafana</button>"
+			html += "</div>"
+			html += "</details>\n"
+		}
 	}
 	logrus.Debug("getTests html: ", html)
 	return c.Render("show_tests",

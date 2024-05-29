@@ -292,3 +292,15 @@ func startTestParseEnv(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 }
+
+func hiddenAddRole(c *fiber.Ctx) error {
+	role := c.Query("role")
+	if role == "" {
+		return c.Status(fiber.StatusBadRequest).SendString("Role parameter is required")
+	}
+	err := addRole(role)
+	if err != nil {
+		logrus.Error(err)
+	}
+	return c.SendString("Role added: " + role)
+}

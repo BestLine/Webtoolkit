@@ -2,7 +2,7 @@
     <script src="/js/sort.js"></script>
     <link rel="stylesheet" href="/css/table.css">
     <input type="text" id="filterInput" placeholder="Search for something...">
-    <table id="myTable">
+    <table class="test-table" id="myTable">
         <thead>
         <tr class="table-sort">
             <th class="sorterby active" data-sorter-direction="asc" data-sorterby="bucket">Проект</th>
@@ -13,8 +13,9 @@
         </tr>
         </thead>
         <tbody>
-                {{ unescape .Table}}
+
         <!-- Table rows will be dynamically added here -->
         </tbody>
     </table>
+    {{ unescape .Table}}
 </div>
