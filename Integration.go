@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/valyala/fasthttp"
 	"net/http"
 )
 
@@ -89,4 +90,39 @@ func sendRequest(c *fiber.Ctx, args ...interface{}) []byte {
 		return nil
 	}
 	return RespToByteReader(response)
+}
+
+func proxyReq(c *fiber.Ctx, host string) error {
+	logrus.Debug("proxyReq host:", host)
+	logrus.Debug("proxyReq path:", string(c.Request().RequestURI()))
+	req := fasthttp.AcquireRequest()
+	defer fasthttp.ReleaseRequest(req)
+
+	resp := fasthttp.AcquireResponse()
+	defer fasthttp.ReleaseResponse(resp)
+
+	proxyURL := host + string(c.Request().RequestURI())
+	//proxyURL := "http://176.214.124.242:6500" + string(c.Request().RequestURI())
+	req.SetRequestURI(proxyURL)
+	req.Header.SetMethod(c.Method())
+
+	c.Request().Header.VisitAll(func(key, value []byte) {
+		req.Header.SetBytesKV(key, value)
+	})
+
+	if c.Method() != fasthttp.MethodGet && c.Method() != fasthttp.MethodHead {
+		req.SetBody(c.Body())
+	}
+
+	if err := fasthttp.Do(req, resp); err != nil {
+		logrus.Error(err.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	c.Response().SetStatusCode(resp.StatusCode())
+	resp.Header.VisitAll(func(key, value []byte) {
+		c.Response().Header.SetBytesKV(key, value)
+	})
+
+	return c.Send(resp.Body())
 }

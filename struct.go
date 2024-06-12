@@ -105,3 +105,12 @@ type GitEnvData struct {
 type GitLabUrl struct {
 	Gitlab string `json:"gitlab"`
 }
+
+type MonitoringUrl struct {
+	Project string `json:"project"`
+	NewUrl  string `json:"new_url"`
+}
+
+type GetMonitoringUrl struct {
+	Project string `json:"project"`
+}

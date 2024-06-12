@@ -244,3 +244,37 @@ body {
 i {
 	margin-right: 10px;
 }
+
+.loading {
+	z-index: 2;
+	border: 1px solid black;
+	border-radius: 25px;
+	width: 25vh; /* Исправлено на vw, вместо vb */
+	height: 25vh;
+	align-content: center;
+	display: flex;
+	position: absolute;
+	flex-direction: column;
+	overflow: hidden;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.loading-animation {
+	/*border: 1px solid black;*/
+	width: 100%;
+	height: 100%;
+}
+
+.loading-text {
+	position: absolute;
+	bottom: 10px; /* Расстояние от нижнего края родителя */
+	left: 50%;
+	transform: translateX(-50%);
+	text-align: center;
+}
+
+.hidden {
+	display: none;
+}

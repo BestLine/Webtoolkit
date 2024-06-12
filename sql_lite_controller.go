@@ -131,6 +131,13 @@ func createSQLiteDB() error {
 		)
 	`)
 
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS monitoring_urls (
+		    project_name VARCHAR(100) NOT NULL,
+		    url VARCHAR(300) NOT NULL
+		)
+	`)
+
 	var count int
 	err = db.QueryRow("SELECT COUNT(*) FROM users WHERE username = 'admin'").Scan(&count)
 	if count == 0 {
@@ -215,6 +222,42 @@ func addRole(role string) error {
 		return err
 	}
 	return nil
+}
+
+func addMonUrl(project string, url string) error {
+	_, err := db.Exec("INSERT INTO monitoring_urls (project_name, url) VALUES (?, ?)", project, url)
+	if err != nil {
+		logrus.Error("addRole: Добавление роли")
+		return err
+	}
+	return nil
+}
+
+func getMonUrls(project string) ([]string, error) {
+	query := "SELECT url FROM monitoring_urls WHERE project_name = ?"
+	fmt.Println("Project:", project)
+	rows, err := db.Query(query, project)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var urls []string
+	for rows.Next() {
+		var url string
+		err := rows.Scan(&url)
+		if err != nil {
+			return nil, err
+		}
+		urls = append(urls, url)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	fmt.Println("URLs:", urls)
+	return urls, nil
 }
 
 func checkUserCredentials(username, password string) (bool, error) {

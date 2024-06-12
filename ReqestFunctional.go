@@ -157,10 +157,6 @@ func assignProjects(c *fiber.Ctx) error {
 	username, _ := (*claims)["username"].(string)
 	phone := c.FormValue("phone")
 	projectNames := c.FormValue("projects")
-	//fmt.Printf("phone: %s\n", phone, reflect.TypeOf(phone))
-	//fmt.Printf("Projects: %v\n", projectNames, reflect.TypeOf(projectNames))
-	//fmt.Printf("username: %v\n", username, reflect.TypeOf(username))
-	//err := AddUserSubscriptions(username, projectNames)
 	err := set_telnumber_to_username(username, phone)
 	if err != nil {
 		logrus.Error("assignProjects set_telnumber_to_username ERROR: ", err)
@@ -223,7 +219,6 @@ func startTestParseEnv(c *fiber.Ctx) error {
 		trimmedPath := parts[0]
 		logrus.Debug("trimmedPath: ", trimmedPath)
 		url = trimmedPath
-		//TODO: обработка энвов для постоения сценария
 		return c.Render("scenario_generator",
 			fiber.Map{"CurrentTests": "res"})
 	}
@@ -282,6 +277,7 @@ func startTestParseEnv(c *fiber.Ctx) error {
 		fmt.Println("ENV key: ", env.Key, "   ENV value: ", env.Value)
 	}
 	resp += "</div>\n"
+	resp += "<input class=\"submit_button\" type=\"submit\" value=\"Скопировать комманду CURL\" onclick=\"createCurlUrl()\"/>\n"
 	resp += "<input class=\"submit_button\" type=\"submit\" value=\"Запустить\" onclick=\"startTest()\"/>\n"
 	resp += "</form>\n"
 	if res != nil {
@@ -303,4 +299,41 @@ func hiddenAddRole(c *fiber.Ctx) error {
 		logrus.Error(err)
 	}
 	return c.SendString("Role added: " + role)
+}
+
+func addMonitoringUrl(c *fiber.Ctx) error {
+	//TODO: переделать запрос с проброской на бэк
+	logrus.Debug("addMonitoringUrl")
+	newUrl := new(MonitoringUrl)
+	if err := json.Unmarshal(c.Body(), newUrl); err != nil {
+		logrus.Error("addMonitoringUrl Unmarshal newUrl error", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	if err := addMonUrl(newUrl.Project, newUrl.NewUrl); err != nil {
+		logrus.Error("addMonitoringUrl addMonUrl error", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	return c.SendString("OK")
+}
+
+func getMonitoringUrl(c *fiber.Ctx) error {
+	//TODO: переделать запрос с проброской на бэк
+	logrus.Debug("getMonitoringUrl")
+	project := new(GetMonitoringUrl)
+	if err := json.Unmarshal(c.Body(), project); err != nil {
+		logrus.Error("getMonitoringUrl Unmarshal project error", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	if urls, err := getMonUrls(project.Project); err != nil {
+		logrus.Error("addMonitoringUrl addMonUrl error", err)
+		return c.SendStatus(fiber.StatusInternalServerError)
+	} else {
+		return c.JSON(urls)
+	}
+}
+
+func getDestroy(c *fiber.Ctx) error {
+	logrus.Debug("getDestroy")
+	url := "http://ms-loadrtst038:9999"
+	return proxyReq(c, url)
 }

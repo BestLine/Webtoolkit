@@ -3,6 +3,7 @@ function test(){
 	const buttons = document.querySelectorAll('.l_btn');
 	let wrapper = $( "#wrapper" )
 	$("#navbarSupportedContent").off("click").on("click","li",function(e){
+		showLoading();
 		if (e.target.textContent!=="Выход") {
 			$('#navbarSupportedContent ul li').removeClass("active");
 			$(this).addClass('active');
@@ -64,7 +65,8 @@ function test(){
 
 			});
 		}
-	setTimeout(function() {anim(); }, 200);
+		setTimeout(function() {anim(); }, 200);
+		hideLoading();
 	});
 }
 
@@ -93,6 +95,7 @@ function anim(e) {
 function NavbarLeftHandler() {
 	const buttons = document.querySelectorAll('.l_btn');
 	$('#navbarLeft').off("click").on("click",function(e) {
+		showLoading()
 		let button_text = e.target.textContent
 		let wrapper = $( "#wrapper" )
 		console.log(button_text);
@@ -147,7 +150,9 @@ function NavbarLeftHandler() {
 				}
 			})
 		}
+		hideLoading()
 	});
+
 }
 
 function toggleNavbarLeft(e) {
@@ -182,6 +187,7 @@ function updateDataPage(event, ev_type) {
 	let data = {};
 	let url
 	var select
+	showLoading()
 	if (ev_type === "bucket") {
 		console.log(`update bucket!`)
 		data["project"] = document.querySelector('#project_options').value
@@ -229,6 +235,7 @@ function updateDataPage(event, ev_type) {
 		}
 	}
 	xhr.send(JSON.stringify(data));
+	hideLoading()
 }
 
 function handleCompareRelease(event) {
@@ -293,7 +300,62 @@ function startTest() {
 	};
 
 	console.log("startTest JSON: ", JSON.stringify(data))
+	showLoading()
 	send_request_with_notification2(data, '/beeload/test/create', "Статус: Запрос на запуск теста отправлен")
+	hideLoading()
+}
+
+function createCurlUrl() {
+	event.preventDefault()
+	let form = document.getElementById('TestStartForm');
+	let gitlab = document.getElementById('url').value;
+	let count = parseInt(document.getElementById('quantity').value, 10);
+	let resource = document.getElementsByName('generator')[0].value;
+	let filename = document.getElementsByName('filename')[0].value;
+	let url = "http://ms-loadrtst038:9999/beeload/test/create"
+
+	let envsData = [];
+	let envFields = document.querySelectorAll('.Envs div');
+
+	if (!form.checkValidity()) {
+		form.reportValidity();
+		return;
+	}
+	envFields.forEach(function(envField) {
+		let key = envField.querySelector('.area_label').textContent.toLowerCase();
+		let value = envField.querySelector('input').value;
+		envsData.push({ key: key, value: value });
+	});
+	const headers = {
+		'Content-Type': 'application/json'
+	};
+	let data = {
+		gitlab: gitlab,
+		count: count,
+		resource: resource,
+		data: envsData,
+		testplan: filename
+	};
+	const curlCommand = generateCurlCommand(url, headers, data);
+	copyToClipboard(curlCommand);
+}
+
+function generateCurlCommand(url, headers, data) {
+	let headerString = '';
+	for (const key in headers) {
+		headerString += ` -H "${key}: ${headers[key]}"`;
+	}
+	const dataString = JSON.stringify(data);
+	return `curl -X POST ${url}${headerString} -d '${dataString}'`;
+}
+
+async function copyToClipboard(text) {
+	try {
+		await navigator.clipboard.writeText(text);
+		alert('cURL command copied to clipboard!');
+	} catch (err) {
+		console.error('Failed to copy text to clipboard: ', err);
+	}
 }
 
 function handleStartTestParseEnv(event, scenario) {
@@ -310,12 +372,16 @@ function handleStartTestParseEnv(event, scenario) {
 	} else {
 		url = '/parse/env/custom'
 	}
+	showLoading()
 	fetch(url, {
 		method: 'POST',
 		body: JSON.stringify(data)
 	})
 		.then(response => response.text())
-		.then(result => $("#wrapper").html("<div class=\"main_page\">" + result + "</div>"))
+		.then(result => {
+				$("#wrapper").html("<div class=\"main_page\">" + result + "</div>")
+				hideLoading();
+		})
 }
 
 function handleStartTest(event) {
@@ -351,7 +417,7 @@ function setActiveProject(event) {
 function send_request_with_notification2(data, url, message) {
 	console.log("send_request_with_notification");
 	let msg = document.querySelector('.error_message');
-
+	showLoading()
 	fetch(url, {
 		method: 'POST',
 		headers: {
@@ -368,9 +434,11 @@ function send_request_with_notification2(data, url, message) {
 		.then(result => {
 			// Дополнительная логика после успешного запроса
 			msg.textContent = message;
+			hideLoading()
 		})
 		.catch(error => {
 			// Обработка ошибок
+			hideLoading()
 			if (error instanceof TypeError) {
 				msg.textContent = "Сетевая ошибка: " + error.message;
 			} else {
@@ -382,6 +450,7 @@ function send_request_with_notification2(data, url, message) {
 function send_request_with_notification(data, url, message) {
 	// В данный момент может только в пост
 	console.log("send_request_with_notification")
+	showLoading()
 	let xhr = new XMLHttpRequest();
 	let msg = document.querySelector('.error_message')
 	xhr.open("POST", url, true);
@@ -398,6 +467,7 @@ function send_request_with_notification(data, url, message) {
 		}
 	});
 	xhr.send(JSON.stringify(data));
+	hideLoading()
 }
 
 function handleCompare(event) {
@@ -461,6 +531,16 @@ function openNewTab(project, test) {
 		"var-send_interval=5&" +
 		"from=now-15m&to=now";
 	window.open(url, '_blank');
+}
+
+function showLoading() {
+	console.log("showLoading")
+	document.getElementById('loading').classList.remove('hidden');
+}
+
+function hideLoading() {
+	console.log("hideLoading")
+	document.getElementById('loading').classList.add('hidden');
 }
 
 $(document).ready(function(){

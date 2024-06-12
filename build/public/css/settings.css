@@ -33,3 +33,27 @@
     float: right;
     /*border: 1px solid red;*/
 }
+
+.right .field {
+    color: red;
+    width: 20vw;
+    height: 6vh;
+    margin: 1vh;
+}
+
+.right .monitoring-text-field {
+    width: 40vw;
+    height: 6vh;
+    margin: 1vh;
+}
+
+.right .monitoring-button {
+    width: 40vw;
+    height: 6vh;
+    margin: 1vh;
+}
+
+.right .monitoring-text-area {
+    width: 40vw;
+    height: 40vh;
+}

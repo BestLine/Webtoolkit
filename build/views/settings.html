@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="/css/settings.css">
+<script src="/js/settings.js"></script>
 <div class="settings_page">
     <div class="settings_project">
         <p class="area_label">{{ unescape .User}}</p>
@@ -17,7 +18,14 @@
     </div>
     <div class="settings_project right">
         <div class="option">
+            <p>Настройка ссылок мониторинга для проектов</p>
+            <select class='bucket field monitoring-project' id="settings_monitoring_project" required>
+                {{ unescape .ActiveProject}}
+            </select>
+            <input class="monitoring-text-field" placeholder=" Вставь сюда ссылку на мониторинг">
+            <button class="monitoring-button" onclick="addMonitoringUrl()">добавить</button>
 
+            <textarea class="monitoring-text-area" readonly>тут какие то ссылки</textarea>
         </div>
     </div>
     <h1 class="msg"></h1>
